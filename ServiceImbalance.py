@@ -103,6 +103,7 @@ def ImbalanceDataPandas(data):
                      'mFRR':ReplaceNaNwithZeros(BIDUP)+ReplaceNaNwithZeros(BIDDOWN)+
                      ReplaceNaNwithZeros(R3FLEX)+ReplaceNaNwithZeros(R3STD)}
     ImbalanceData = pd.DataFrame(ImbalanceData, index=TIME)
+
     return ImbalanceData
 
 def ReplaceNaNwithZeros(nparray):
