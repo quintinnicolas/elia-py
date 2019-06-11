@@ -8,7 +8,7 @@ Created on Sun Sep  9 20:06:49 2018
 
 import ServiceImbalance as file1
 import matplotlib.pyplot as plt
-plt.switch_backend('WXAgg')
+plt.switch_backend('agg')
 import numpy as np
 
 #CALL TO ELIA'S WEBSERVICE AND RETRIEVE JSON DATA IN A LIST  
