@@ -7,7 +7,7 @@ Created on Fri Oct 12 17:00:00 2018
 """
 import ServiceSolar as file3
 import matplotlib.pyplot as plt
-plt.switch_backend('agg')
+#plt.switch_backend('agg')
 from datetime import date
 from datetime import timedelta
 from datetime import datetime

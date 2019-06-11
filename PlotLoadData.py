@@ -7,7 +7,7 @@ Created on Sun Dec 23 18:00:09 2018
 """
 import ServiceLoad as file4
 import matplotlib.pyplot as plt
-plt.switch_backend('agg')
+#plt.switch_backend('agg')
 from datetime import date
 from datetime import timedelta
 

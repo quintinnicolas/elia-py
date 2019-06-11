@@ -8,7 +8,7 @@ Created on Tue Feb 26 16:43:59 2019
 
 import ServiceImbalancePrice as file5
 import matplotlib.pyplot as plt
-plt.switch_backend('agg')
+#plt.switch_backend('agg')
 from datetime import date
 import numpy as np
 
