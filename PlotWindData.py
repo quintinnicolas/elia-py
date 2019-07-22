@@ -7,6 +7,7 @@ Created on Fri Sep 14 19:44:29 2018
 """
 import ServiceWind as file2
 import matplotlib.pyplot as plt
+#plt.switch_backend('agg')
 from datetime import date
 from datetime import timedelta
 from datetime import datetime
