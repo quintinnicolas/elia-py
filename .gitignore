@@ -2,3 +2,6 @@
 *.ipynb
 *.pyc
 *.ipynb
+.project
+.pydevproject
+.project
