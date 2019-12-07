@@ -6,3 +6,4 @@
 .pydevproject
 .project
 *.png
+.DS_Store
