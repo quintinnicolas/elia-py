@@ -22,6 +22,8 @@ PriceData = file5.ImbalancePriceService(date_today)
 #PLOT BAR CHART  
 range_between_ticks = 5
 plt_bar_index = range(len(PriceData))
+x_loc = np.arange(0,len(PriceData),range_between_ticks)
+x_label = PriceData.index[::range_between_ticks].strftime("%H:%M")
 
 #BAR CHART ON PRIMARY Y-AXIS
 fig, ax1 = plt.subplots(figsize=(8,4))
@@ -29,8 +31,6 @@ ax1.bar(plt_bar_index, PriceData['\nNRV\n(MW)'].values, width=0.8, label='NRV', 
 ax1.bar(plt_bar_index, PriceData['SI\n(MW)'].values, width=0.8, label='SI', alpha = 0.15)
 ax1.set_ylabel('[MW]')
 ax1.legend(loc="upper left")
-plt.xticks(np.arange(0,len(PriceData),range_between_ticks), PriceData.index[::range_between_ticks].strftime("%H:%M"), rotation=-45)
-plt.xlabel("TIME")
 
 #LINE CHART ON SECONDARY Y-AXIS
 ax2 = ax1.twinx()  
@@ -43,5 +43,7 @@ ax2.set_ylabel('[€/MWh]')
 plt.title('Imbalance Volumes & Prices in Belgium \n on %s from %s to %s' %(PriceData.index[0].strftime("%Y-%m-%d"),PriceData.index[0].strftime("%H:%M"), PriceData.index[-1].strftime("%H:%M")))
 plt.grid(True)
 plt.legend()
+plt.xticks(x_loc, x_label, rotation=-45)
+plt.xlabel("TIME")
 plt.savefig("DataPrice.svg",bbox_inches='tight')
 #plt.show()
