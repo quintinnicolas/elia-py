@@ -22,7 +22,7 @@ def PlotImbalancePriceData():
     PriceData = file5.ImbalancePriceService(date_today)
     
     #PLOT BAR CHART  
-    range_between_ticks = len(PriceData)//10
+    range_between_ticks = max(len(PriceData)//10,1)
     plt_bar_index = range(len(PriceData))
     x_loc = np.arange(0,len(PriceData),range_between_ticks)
     x_label = PriceData.index[::range_between_ticks].strftime("%H:%M")
@@ -63,7 +63,7 @@ def PlotImbalanceData():
     ImbalanceData = file1.ImbalanceDataPandas(data)
     
     #PLOT BAR CHART  
-    range_between_ticks = len(ImbalanceData)//10
+    range_between_ticks = max(len(ImbalanceData)//10,1)
     plt_bar_index = range(len(ImbalanceData))
     x_loc = np.arange(0,len(ImbalanceData),range_between_ticks)
     x_label = ImbalanceData.index[::range_between_ticks].strftime("%H:%M")
