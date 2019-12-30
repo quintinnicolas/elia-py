@@ -7,3 +7,4 @@
 .project
 *.png
 .DS_Store
+*.svg
