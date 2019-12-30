@@ -6,9 +6,9 @@ Created on Mon Sep 10 20:45:01 2018
 @author: nicolasquintin
 """
 import urllib.request
-from datetime import datetime
 import numpy as np
 import pandas as pd
+import ServiceImbalance 
 
 def SolarService(startdate,enddate):
     import xml.etree.ElementTree as ET
@@ -63,7 +63,9 @@ def appendindex(ET_list):
     np_array = np.empty(0)
     for elements in ET_list:
         try:
-            np_array = np.append(np_array,datetime.strptime(elements.text[:-1],'%Y-%m-%dT%H:%M:%S'))
+            timeindex = pd.to_datetime(elements.text[:-1])
+            timeindex = ServiceImbalance.adapt_for_timezone(timeindex)
+            np_array = np.append(np_array,timeindex)
         except:
             np_array = np.append(np_array,np.nan)
     return np_array
