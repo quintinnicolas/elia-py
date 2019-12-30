@@ -17,14 +17,37 @@ def ImbalanceService():
     INPUT = /
     OUTPUT = LIST CONTAINING THE JSON OUTPUT OF ELIA'S IMBALANCE WEBSERVICE
     """
-    
+
     with urllib.request.urlopen("https://publications.elia.be/Publications/Publications/InternetImbalance.v1.svc/GetImbalanceMeasuresByTime") as url:
         data = json.loads(url.read().decode())
         for m in data:
             TimestampUtc = re.split('\(|\)', m["Time"])[1][:10]
-            date = datetime.datetime.fromtimestamp(int(TimestampUtc))
-            m["Time"] = date
+            date = pd.Timestamp.fromtimestamp(int(TimestampUtc))
+            m["Time"] = adapt_for_timezone(date)
     return data
+
+def adapt_for_timezone(date):
+    """
+
+    Parameters
+    ----------
+    date : pandas timestamp object with implicit belgian timezone
+
+    Returns
+    -------
+    date : pandas timestamp object with explicit local timezone
+
+    """
+    from pytz import timezone
+    from dateutil.tz import tzlocal
+    
+    brussels = timezone("Europe/Brussels")
+    local = timezone(datetime.datetime.now(tzlocal()).tzname())
+    #local = timezone("Etc/UTC")
+    
+    date = brussels.localize(date)
+    date = date.tz_convert(local).tz_localize(None)
+    return date
 
 def ImbalanceDataPandas(data):
     """
