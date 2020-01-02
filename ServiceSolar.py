@@ -6,28 +6,36 @@ Created on Mon Sep 10 20:45:01 2018
 @author: nicolasquintin
 """
 import urllib.request
+import xml.etree.ElementTree as ET
 import numpy as np
 import pandas as pd
-import ServiceImbalance 
+import ServiceImbalance
 
 def SolarService(startdate,enddate):
-    import xml.etree.ElementTree as ET
     with urllib.request.urlopen('https://publications.elia.be/Publications/publications/solarforecasting.v4.svc/GetChartDataForZoneXml?dateFrom=' + startdate + '&dateTo=' + enddate + '&sourceId=1') as url:
         solardata = url.read().decode("iso-8859-1")
         root = ET.fromstring(solardata)
         return root
     
-def SolarDataPandas(root):
+def XMLtoPandas(root):
     """
     INPUT = RAW DATA WHICH IS THE RESULT OF THE SOLARSERVICE() FUNCTION
     OUTPUT = PANDAS MATRIX CONTAINING THE REARRANGED DATA
     """    
     
-    webservice = '{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.SolarForecasting.v4}'
-    realtimelist = root.findall(webservice + 'SolarForecastingChartDataForZoneItems/' + webservice + 'SolarForecastingChartDataForZoneItem/' + webservice + 'RealTime')
-    mostrecentlist = root.findall(webservice + 'SolarForecastingChartDataForZoneItems/' + webservice + 'SolarForecastingChartDataForZoneItem/' + webservice + 'MostRecentForecast')
-    dayaheadlist = root.findall(webservice + 'SolarForecastingChartDataForZoneItems/' + webservice + 'SolarForecastingChartDataForZoneItem/' + webservice + 'DayAheadForecast')
-    timelist = root.findall(webservice + 'SolarForecastingChartDataForZoneItems/' + webservice + 'SolarForecastingChartDataForZoneItem/' + webservice + 'StartsOn/' + '{http://schemas.datacontract.org/2004/07/System}DateTime')
+    if "WindForecasting" in str(root):
+        webservice = '{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.WindForecasting.v2}'
+        realtimelist = root.findall(webservice + 'ForecastGraphItems/' + webservice + 'WindForecastingGraphItem/' + webservice + 'Realtime')
+        mostrecentlist = root.findall(webservice + 'ForecastGraphItems/' + webservice + 'WindForecastingGraphItem/' + webservice + 'MostRecentForecast')
+        dayaheadlist = root.findall(webservice + 'ForecastGraphItems/' + webservice + 'WindForecastingGraphItem/' + webservice + 'DayAheadForecast')
+        timelist = root.findall(webservice + 'ForecastGraphItems/' + webservice + 'WindForecastingGraphItem/'+ webservice + 'StartsOn/'+'{http://schemas.datacontract.org/2004/07/System}DateTime')
+        
+    elif "SolarForecasting" in str(root):
+        webservice = '{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.SolarForecasting.v4}'
+        realtimelist = root.findall(webservice + 'SolarForecastingChartDataForZoneItems/' + webservice + 'SolarForecastingChartDataForZoneItem/' + webservice + 'RealTime')
+        mostrecentlist = root.findall(webservice + 'SolarForecastingChartDataForZoneItems/' + webservice + 'SolarForecastingChartDataForZoneItem/' + webservice + 'MostRecentForecast')
+        dayaheadlist = root.findall(webservice + 'SolarForecastingChartDataForZoneItems/' + webservice + 'SolarForecastingChartDataForZoneItem/' + webservice + 'DayAheadForecast')
+        timelist = root.findall(webservice + 'SolarForecastingChartDataForZoneItems/' + webservice + 'SolarForecastingChartDataForZoneItem/' + webservice + 'StartsOn/' + '{http://schemas.datacontract.org/2004/07/System}DateTime')
     
     index_dic = {"TIME":timelist}
     data_dic = {
@@ -39,13 +47,13 @@ def SolarDataPandas(root):
     for key,values in index_dic.items():
         TIME = appendindex(values)  
         
-    df_solar = pd.DataFrame()
+    df_final = pd.DataFrame()
     for key,values in data_dic.items():
         nparray = appenddata(values)
         df = pd.DataFrame(nparray,index=TIME,columns=[key])
-        df_solar = pd.concat([df_solar,df],axis=1)
+        df_final = pd.concat([df_final,df],axis=1)
 
-    return df_solar
+    return df_final
 
 def appenddata(ET_list):
     np_array = np.empty(0)

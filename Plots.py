@@ -114,7 +114,7 @@ def PlotSolarData():
     startdate = str(date.today() )
     enddate = str(date.today() + timedelta(1))
     root = file3.SolarService(startdate, enddate)
-    SolarData = file3.SolarDataPandas(root)
+    SolarData = file3.XMLtoPandas(root)
     x_loc = SolarData.index[0::12]
     x_label = x_loc.format(formatter=lambda x: x.strftime('%H:%M'))
         
@@ -134,11 +134,12 @@ def PlotSolarData():
 def PlotWindData():
     
     import ServiceWind as file2
+    import ServiceSolar as file3
     
     startdate = str(date.today() )
     enddate = str(date.today() + timedelta(1))
     root = file2.WindService(startdate, enddate)
-    WindData = file2.WindDataPandas(root)
+    WindData = file3.XMLtoPandas(root)
     x_loc = WindData.index[0::12]
     x_label = x_loc.format(formatter=lambda x: x.strftime('%H:%M'))
     
@@ -156,4 +157,5 @@ def PlotWindData():
     #plt.show()
     
 if __name__ == "__main__":
-    PlotImbalanceData()
+    PlotSolarData()
+    PlotWindData()
