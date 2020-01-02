@@ -13,6 +13,8 @@ plt.switch_backend('agg')
 from datetime import date
 from datetime import timedelta
 import numpy as np
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
     
 def PlotImbalancePriceData():
     import ServiceImbalancePrice as file5
@@ -152,3 +154,6 @@ def PlotWindData():
     plt.grid(True)
     fig.savefig("DataWind.svg",bbox_inches='tight')
     #plt.show()
+    
+if __name__ == "__main__":
+    PlotImbalanceData()

@@ -7,7 +7,6 @@ Created on Sun Sep  9 18:38:19 2018
 """
 import urllib.request
 import json
-import datetime
 import re
 import numpy as np
 import pandas as pd
@@ -22,7 +21,7 @@ def ImbalanceService():
         data = json.loads(url.read().decode())
         for m in data:
             TimestampUtc = re.split('\(|\)', m["Time"])[1][:10]
-            date = pd.Timestamp.fromtimestamp(int(TimestampUtc))
+            date = pd.Timestamp.utcfromtimestamp(int(TimestampUtc))
             m["Time"] = adapt_for_timezone(date)
     return data
 
@@ -31,22 +30,20 @@ def adapt_for_timezone(date):
 
     Parameters
     ----------
-    date : pandas timestamp object with implicit belgian timezone
+    date : pandas timestamp object with implicit UTC timezone
 
     Returns
     -------
-    date : pandas timestamp object with explicit local timezone
+    date : pandas timestamp object with implicit belgian timezone
 
     """
     from pytz import timezone
-    from dateutil.tz import tzlocal
     
+    utc = timezone("Etc/UTC")
     brussels = timezone("Europe/Brussels")
-    local = timezone(datetime.datetime.now(tzlocal()).tzname())
-    #local = timezone("Etc/UTC")
     
-    date = brussels.localize(date)
-    date = date.tz_convert(local).tz_localize(None)
+    date = utc.localize(date)
+    date = date.tz_convert(brussels).tz_localize(None)
     return date
 
 def ImbalanceDataPandas(data):
