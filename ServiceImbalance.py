@@ -11,7 +11,7 @@ import re
 import numpy as np
 import pandas as pd
 
-def ImbalanceService():
+def ImbalanceService(UTC = False):
     """
     INPUT = /
     OUTPUT = LIST CONTAINING THE JSON OUTPUT OF ELIA'S IMBALANCE WEBSERVICE
@@ -22,7 +22,10 @@ def ImbalanceService():
         for m in data:
             TimestampUtc = re.split('\(|\)', m["Time"])[1][:10]
             date = pd.Timestamp.utcfromtimestamp(int(TimestampUtc))
-            m["Time"] = adapt_for_timezone(date)
+            if not(UTC):
+                m["Time"] = adapt_for_timezone(date)
+            else:
+                m["Time"] = date
     return data
 
 def adapt_for_timezone(date):

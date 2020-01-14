@@ -59,7 +59,7 @@ def PlotImbalanceData():
     import ServiceImbalance as file1
     
     #CALL TO ELIA'S WEBSERVICE AND RETRIEVE JSON DATA IN A LIST  
-    data = file1.ImbalanceService()
+    data = file1.ImbalanceService(UTC = False)
     
     #TRANSFORM RAW DATA INTO PANDAS STRUCTURE
     ImbalanceData = file1.ImbalanceDataPandas(data)
