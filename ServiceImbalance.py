@@ -28,7 +28,7 @@ def ImbalanceService(UTC = False):
                 m["Time"] = date
     return data
 
-def adapt_for_timezone(date):
+def adapt_for_timezone(date,timezonefrom="Etc/UTC",timezoneto="Europe/Brussels"):
     """
 
     Parameters
@@ -42,11 +42,11 @@ def adapt_for_timezone(date):
     """
     from pytz import timezone
     
-    utc = timezone("Etc/UTC")
-    brussels = timezone("Europe/Brussels")
+    initial = timezone(timezonefrom)
+    final = timezone(timezoneto)
     
-    date = utc.localize(date)
-    date = date.tz_convert(brussels).tz_localize(None)
+    date = initial.localize(date)
+    date = date.tz_convert(final).tz_localize(None)
     return date
 
 def ImbalanceDataPandas(data):

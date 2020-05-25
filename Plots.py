@@ -12,36 +12,41 @@ rcParams.update({'font.size': 11})
 plt.switch_backend('agg')
 from datetime import date
 from datetime import timedelta
+from datetime import datetime
 import numpy as np
 #from pandas.plotting import register_matplotlib_converters
 #register_matplotlib_converters()
     
-def PlotImbalancePriceData():
+def PlotImbalancePriceData(**kwargs):
     import ServiceImbalancePrice as file5
     
     #RETRIEVE DATA FROM ELIA'S WEBSITE INTO A DATAFRAME
-    date_today = str(date.today())
-    PriceData = file5.ImbalancePriceService(date_today)
+    if "data" in kwargs: #identical to in kwargs.keys()
+        PriceData = kwargs["data"]
+    else:
+        PriceData = file5.ImbalancePriceService(str(date.today()))
     
     #PLOT BAR CHART  
-    range_between_ticks = max(len(PriceData)//10,1)
+    range_between_ticks = max(len(PriceData)//(10),1)
     plt_bar_index = range(len(PriceData))
     x_loc = np.arange(0,len(PriceData),range_between_ticks)
     x_label = PriceData.index[::range_between_ticks].strftime("%H:%M")
     
     #BAR CHART ON PRIMARY Y-AXIS
     fig, ax1 = plt.subplots(figsize=(8,4))
-    ax1.bar(plt_bar_index, PriceData['\nNRV\n(MW)'].values, width=0.8, label='NRV', alpha = 0.15)
-    ax1.bar(plt_bar_index, PriceData['SI\n(MW)'].values, width=0.8, label='SI', alpha = 0.15)
+    ax1.bar(plt_bar_index, PriceData['\nNRV\n(MW)'].values, color = '#00D5AE', width=0.8, label='NRV', alpha = 0.15)
+    ax1.bar(plt_bar_index, PriceData['SI\n(MW)'].values, color='#FE5F55', width=0.8, label='System Imbalance', alpha = 0.15)
     ax1.set_ylabel('[MW]')
     ax1.legend(loc="upper left")
+    ax1.margins(x=0)
     
     #LINE CHART ON SECONDARY Y-AXIS
-    ax2 = ax1.twinx()  
-    ax2.plot(plt_bar_index, PriceData['NEG\n(€/MWh)'].values, '#FE5F55', label = 'NEG', linewidth=2.5)
-    ax2.plot(plt_bar_index, PriceData['POS\n(€/MWh)'].values, '#00D5AE', label = 'POS', linewidth=2.5)
-    ax2.legend
+    ax2 = ax1.twinx()
+    #ax2.plot(plt_bar_index, PriceData['NEG\n(€/MWh)'].values, '#FE5F55', label = 'NEG', linewidth=2.5)
+    ax2.plot(plt_bar_index, PriceData['POS\n(€/MWh)'].values, '#00D5AE', label = 'Imbalance Price', linewidth=2.5)
     ax2.set_ylabel('[€/MWh]')
+    ax2.legend(loc="upper right")
+    ax2.margins(x=0)
     
     #FIGURE PARAMETERS
     for ax in fig.axes:
@@ -50,7 +55,6 @@ def PlotImbalancePriceData():
         plt.xlabel("TIME")
     plt.title('Imbalance Volumes & Prices in Belgium \n on %s from %s to %s' %(PriceData.index[0].strftime("%Y-%m-%d"),PriceData.index[0].strftime("%H:%M"), PriceData.index[-1].strftime("%H:%M")))
     plt.grid(True)
-    plt.legend()
     plt.savefig("DataPrice.svg",bbox_inches='tight')
     #plt.show()
     
@@ -84,12 +88,15 @@ def PlotImbalanceData():
     fig.savefig("DataImbalance.svg",bbox_inches='tight')
     #plt.show()
 
-def PlotLoadData():   
+def PlotLoadData(**kwargs):   
     
     import ServiceLoad as file4
     
-    enddate = str(date.today() )
-    startdate = str(date.today() - timedelta(1))
+    if "date" in kwargs: #identical to in kwargs.keys()
+        enddate = kwargs["date"]
+    else:
+        enddate = str(date.today())
+    startdate = str(datetime.strptime(enddate,"%Y-%m-%d").date() - timedelta(1))
     LoadData = file4.LoadService(startdate,enddate)
     x_loc = LoadData.index[0::12]
     x_label = x_loc.format(formatter=lambda x: x.strftime('%H:%M'))
@@ -107,12 +114,15 @@ def PlotLoadData():
     fig.savefig("DataLoad.svg",  bbox_inches='tight')
     #plt.show()
 
-def PlotSolarData():
+def PlotSolarData(**kwargs):
     
     import ServiceSolar as file3
     
-    startdate = str(date.today() )
-    enddate = str(date.today() + timedelta(1))
+    if "date" in kwargs: #identical to in kwargs.keys()
+        startdate = kwargs["date"]
+    else:
+        startdate = str(date.today())
+    enddate = str(datetime.strptime(startdate,"%Y-%m-%d").date() + timedelta(1))
     root = file3.SolarService(startdate, enddate)
     SolarData = file3.XMLtoPandas(root)
     x_loc = SolarData.index[0::12]
@@ -131,13 +141,16 @@ def PlotSolarData():
     fig.savefig("DataSolar.svg",bbox_inches='tight')
     #plt.show()
     
-def PlotWindData():
+def PlotWindData(**kwargs):
     
     import ServiceWind as file2
     import ServiceSolar as file3
     
-    startdate = str(date.today() )
-    enddate = str(date.today() + timedelta(1))
+    if "date" in kwargs: #identical to in kwargs.keys()
+        startdate = kwargs["date"]
+    else:
+        startdate = str(date.today())
+    enddate = str(datetime.strptime(startdate,"%Y-%m-%d").date() + timedelta(1))
     root = file2.WindService(startdate, enddate)
     WindData = file3.XMLtoPandas(root)
     x_loc = WindData.index[0::12]
