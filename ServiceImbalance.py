@@ -56,18 +56,9 @@ def ImbalanceDataPandas(data):
     """
     
     #DECLARE EMPTY NUMPY ARRAYS 
-    NRV = np.empty(0)
-    SI = np.empty(0)
-    TIME = np.empty(0)
-    R2UP = np.empty(0)
-    R2DOWN = np.empty(0)
-    BIDUP = np.empty(0)
-    BIDDOWN = np.empty(0)
-    R3FLEX = np.empty(0)
-    R3STD = np.empty(0)
-    IGCCUP = np.empty(0)
-    IGCCDOWN = np.empty(0)
-
+    NRV = SI = TIME = R2UP = R2DOWN = BIDUP = BIDDOWN = \
+    R3FLEX = R3STD = IGCCUP = IGCCDOWN = np.empty(0)
+    
     #LOOP OVER THE DATA AND ARRANGE THEM INTO NUMPY ARRAY.
     #IF AN ERROR OCCURS, SIMPLY REPLACE THE MISSING DATA WITH NAN 
     for i in data:
