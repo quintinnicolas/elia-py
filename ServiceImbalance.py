@@ -10,15 +10,18 @@ import json
 import re
 import numpy as np
 import pandas as pd
+import ssl
 
 def ImbalanceService(utc = False):
     """
     INPUT = /
     OUTPUT = LIST CONTAINING THE JSON OUTPUT OF ELIA'S IMBALANCE WEBSERVICE
     """
-
-    with urllib.request.urlopen("https://publications.elia.be/Publications/Publications/InternetImbalance.v1.svc/GetImbalanceMeasuresByTime") as url:
+    context = ssl.SSLContext()
+    URL = "https://publications.elia.be/Publications/Publications/InternetImbalance.v1.svc/GetImbalanceMeasuresByTime"
+    with urllib.request.urlopen(URL, context=context) as url:
         data = json.loads(url.read().decode())
+
         for m in data:
             TimestampUtc = re.split('\(|\)', m["Time"])[1][:10]
             date = pd.Timestamp.utcfromtimestamp(int(TimestampUtc))
