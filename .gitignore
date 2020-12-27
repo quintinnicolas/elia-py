@@ -8,3 +8,5 @@
 *.png
 .DS_Store
 *.svg
+.idea
+.aws
