@@ -31,7 +31,11 @@ def imbalance_dataframe(json_data):
     df = pd.pivot_table(df, values='Value', index='Time', columns='Name')
 
     df['R3'] = df['R3Flex'] + df['R3Std']
-    df['aFRR'] = df['R2Up'] + df['R2Down'] + df['IGCCUp'] + df['IGCCDown']
-    df['mFRR'] = df['BidsUp'] + df['BidsDown'] + df['R3Flex'] + df['R3Std']
+    df['aFRR'] = df['R2Up'] - df['R2Down'] + df['IGCCUp'] - df['IGCCDown']
+    df['mFRR'] = df['BidsUp'] - df['BidsDown'] + df['R3Flex'] + df['R3Std']
 
     return df
+
+
+if __name__ == '__main__':
+    df_imbalance = imbalance_dataframe(imbalance_raw_data(False))
