@@ -2,6 +2,7 @@
 @author: nicolasquintin
 """
 import pandas as pd
+import ssl
 # URL_LOAD_1 = 'https://publications.elia.be/Publications/Publications/STLForecasting.v1.svc/ExportSTLFForecastGraph?fromDate=%sT23%3A00%3A00.000Z&toDate=%sT23%3A00%3A00.000Z'
 
 # Escape % symbol in url doubling the character (%%)
@@ -10,6 +11,7 @@ URL_LOAD_2 = "https://griddata.elia.be/eliabecontrols.prod/interface/fdn/downloa
 
 
 def load_forecast_1(start_date, end_date):
+    ssl._create_default_https_context = ssl._create_unverified_context
     url = URL_LOAD_1 % (start_date, end_date)
     load = pd.read_excel(url)
     load.index = pd.to_datetime(load.DateTime, dayfirst=True)
