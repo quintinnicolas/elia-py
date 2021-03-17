@@ -28,7 +28,6 @@ def imbalance_raw_data(utc=False):
 
 def imbalance_dataframe(json_data):
     df = pd.json_normalize(json_data, 'Measurements', 'Time')
-    # df['Value'] = df['Value'].fillna(0)
     df = pd.pivot_table(df, values='Value', index='Time', columns='Name', dropna=False)
 
     df['R3'] = df['R3Flex'] + df['R3Std']
