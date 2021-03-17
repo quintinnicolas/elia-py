@@ -59,11 +59,11 @@ def append_index(elements):
     np_array = np.empty(0)
     for element in elements:
         try:
-            timeindex = pd.to_datetime(element.text[:-1])
-            timeindex = adapt_for_timezone(timeindex)
-            np_array = np.append(np_array,timeindex)
+            time = pd.to_datetime(element.text[:-1])
+            time = adapt_for_timezone(time)
+            np_array = np.append(np_array, time)
         except:
-            np_array = np.append(np_array,np.nan)
+            np_array = np.append(np_array, np.nan)
     return np_array
 
 
