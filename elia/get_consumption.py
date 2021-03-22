@@ -3,11 +3,9 @@
 """
 import pandas as pd
 import ssl
-# URL_LOAD_1 = 'https://publications.elia.be/Publications/Publications/STLForecasting.v1.svc/ExportSTLFForecastGraph?fromDate=%sT23%3A00%3A00.000Z&toDate=%sT23%3A00%3A00.000Z'
 
-# Escape % symbol in url doubling the character (%%)
-URL_LOAD_1 = 'https://publications.elia.be/Publications/Publications/STLForecasting.v1.svc/ExportSTLFForecastGraph?fromDate=%sT23%%3A00%%3A00.000Z&toDate=%sT23%%3A00%%3A00.000Z'
-URL_LOAD_2 = "https://griddata.elia.be/eliabecontrols.prod/interface/fdn/download/datadownload/0b48be166289678d663e9ed2f3ced7d7"
+import elia
+from elia import URL_LOAD_1, URL_LOAD_2
 
 
 def load_forecast_1(start_date, end_date):
@@ -23,7 +21,7 @@ def load_forecast_2():
     load = load.drop('Unnamed: 103', 1)
     
     index = load.index.names
-    columns = load.columns
+    columns = elia.COLUMNS
     load = pd.melt(load.reset_index(), id_vars=index, value_vars=columns)
     
     # Create datetime

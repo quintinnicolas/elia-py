@@ -6,9 +6,9 @@ import json
 import re
 import pandas as pd
 import ssl
-from utils_elia import adapt_for_timezone
 
-URL_IMBALANCE = r"https://publications.elia.be/Publications/Publications/InternetImbalance.v1.svc/GetImbalanceMeasuresByTime"
+from elia import URL_IMBALANCE
+from elia.utils_elia import adapt_for_timezone
 
 
 def imbalance_raw_data(utc=False):

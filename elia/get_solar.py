@@ -5,7 +5,7 @@ import urllib.request
 import ssl
 import xml.etree.ElementTree as ElementTree
 
-URL_SOLAR = 'https://publications.elia.be/Publications/publications/solarforecasting.v4.svc/GetChartDataForZoneXml?dateFrom=%s&dateTo=%s&sourceId=1'
+from elia import URL_SOLAR
 
 
 def solar_forecast(start_date, end_date):

@@ -5,7 +5,7 @@ import urllib.request
 import ssl
 import xml.etree.ElementTree as ElementTree
 
-URL_WIND = 'https://publications.elia.be/Publications/Publications/WindForecasting.v2.svc/GetForecastData?beginDate=%s&endDate=%s&isOffshore=&isEliaConnected='
+from elia import URL_WIND
 
 
 def wind_forecast(start_date, end_date):
