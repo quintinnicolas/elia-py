@@ -8,6 +8,18 @@ import xml.etree.ElementTree as ElementTree
 
 URL_PRICE_EXCEL = 'https://publications.elia.be/Publications/Publications/ImbalanceNrvPrice.v3.svc/GetImbalanceNrvPricesExcel?day=%s'
 URL_PRICE_XML = "https://publications.elia.be/Publications/Publications/ImbalanceNrvPrice.v1.svc/GetImbalanceNrvPrices?day=%s"
+PREFIX = r'{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.ImbalanceNrvPrice.V1}'
+
+ALPHA = "Alpha"
+BETA = "Beta"
+DATETIME = "DateTime"
+MDP = "MDP"
+MIP = "MIP"
+NRV = "NRV"
+P_NEG = "PNeg"
+P_POS = "PPos"
+SI = "SI"
+columns = [ALPHA, BETA, MDP, MIP, NRV, SI, P_POS, P_NEG]
 
 
 def imbalance_prices(date):
@@ -23,23 +35,23 @@ def imbalance_prices_xml(date):
         price_data = url.read().decode("iso-8859-1")
         xml = ElementTree.fromstring(price_data)
 
-        prefix = r'{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.ImbalanceNrvPrice.V1}'
+        # Retrieve columns
+        dic_imbalance = {}
+        for column in columns:
+            elements = xml.findall(PREFIX + 'ImbalanceNrvPrices/' + PREFIX + 'ImbalanceNrvPrice/' + PREFIX + column)
+            dic_imbalance[column] = [float(elem.text) for elem in elements]
 
-        # Retrieve Positive Imbalances
-        elements = xml.findall(prefix + 'ImbalanceNrvPrices/' + prefix + 'ImbalanceNrvPrice/' + prefix + 'PPos')
-        positive_imbalance = [float(elem.text) for elem in elements]
-
-        # Retrieve Negative Imbalances
-        elements = xml.findall(prefix + 'ImbalanceNrvPrices/' + prefix + 'ImbalanceNrvPrice/' + prefix + 'PNeg')
-        negative_imbalance = [float(elem.text) for elem in elements]
-
-        # Retrieve Datetimes
-        elements = xml.findall(prefix + 'ImbalanceNrvPrices/' + prefix + 'ImbalanceNrvPrice/' + prefix + 'DateTime')
-        datetimes = pd.to_datetime([elem.text for elem in elements])
+        # Retrieve index
+        elements = xml.findall(PREFIX + 'ImbalanceNrvPrices/' + PREFIX + 'ImbalanceNrvPrice/' + PREFIX + DATETIME)
+        index = pd.to_datetime([elem.text for elem in elements])
 
         # Convert to dataframe
-        dic_columns = {"POS [EUR/MWh]": positive_imbalance,
-                       "NEG [EUR/MWh]": negative_imbalance}
-        df = pd.DataFrame(dic_columns, index=datetimes)
+        df = pd.DataFrame(dic_imbalance, index=index)
+        df.index.name = DATETIME
 
         return df
+
+
+if __name__ == '__main__':
+    df_test = imbalance_prices_xml("2020-03-20")
+    print(df_test)
