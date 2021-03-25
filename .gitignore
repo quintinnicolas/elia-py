@@ -1,11 +1,3 @@
-*.ipynb
 *.pyc
-*.ipynb
-.project
-.pydevproject
-.project
-*.png
-.DS_Store
-*.svg
 .idea
-.aws
+.DS_Store
