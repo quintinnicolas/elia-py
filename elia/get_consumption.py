@@ -38,7 +38,7 @@ def load_forecast_2():
     load = load[load['value'] > 0]
     
     # DST issue in csv: data go from 01:45 -> 02:00 -> 03:15 instead of 01:45 -> 03:00 -> 03:15
-    load.rename(index={pd.to_datetime('2020-03-29 02:00:00'):pd.to_datetime('2020-03-29 03:00:00')},
+    load.rename(index={pd.to_datetime('2020-03-29 02:00:00'): pd.to_datetime('2020-03-29 03:00:00')},
                 inplace=True)
 
     # Sort data and localize belgian timezone
