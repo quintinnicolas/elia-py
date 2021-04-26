@@ -6,7 +6,8 @@ import ssl
 import urllib.request
 import xml.etree.ElementTree as ElementTree
 
-from elia import URL_IMB_PRICE_EXCEL, URL_IMB_PRICE_XML, PREFIX, DATETIME, COLUMNS
+from elia import URL_IMB_PRICE_EXCEL, URL_IMB_PRICE_XML, URL_IMB_PRICE_PER_MIN, PREFIX_XML, DATETIME, COLUMNS, \
+    COLUMNS_PER_MIN
 
 
 def imbalance_prices(date):
@@ -25,11 +26,11 @@ def imbalance_prices_xml(date):
         # Retrieve columns
         dic_imbalance = {}
         for column in COLUMNS:
-            elements = xml.findall(PREFIX + 'ImbalanceNrvPrices/' + PREFIX + 'ImbalanceNrvPrice/' + PREFIX + column)
+            elements = xml.findall(PREFIX_XML + 'ImbalanceNrvPrices/' + PREFIX_XML + 'ImbalanceNrvPrice/' + PREFIX_XML + column)
             dic_imbalance[column] = [float(elem.text) for elem in elements]
 
         # Retrieve index
-        elements = xml.findall(PREFIX + 'ImbalanceNrvPrices/' + PREFIX + 'ImbalanceNrvPrice/' + PREFIX + DATETIME)
+        elements = xml.findall(PREFIX_XML + 'ImbalanceNrvPrices/' + PREFIX_XML + 'ImbalanceNrvPrice/' + PREFIX_XML + DATETIME)
         index = pd.to_datetime([elem.text for elem in elements])
 
         # Convert to dataframe
@@ -39,6 +40,20 @@ def imbalance_prices_xml(date):
         return df
 
 
+def imbalance_prices_per_min():
+
+    with urllib.request.urlopen(URL_IMB_PRICE_PER_MIN, context=ssl.SSLContext()) as url:
+        json_data = url.read().decode("iso-8859-1")
+        df = pd.read_json(json_data)
+        df.index = pd.to_datetime(df.minute)
+
+        columns_to_drop = [col for col in df.columns if col not in COLUMNS_PER_MIN]
+        df.drop(columns_to_drop, axis=1, inplace=True)
+
+        return df
+
+
 if __name__ == '__main__':
-    df_test = imbalance_prices_xml("2020-03-20")
+    # df_test = imbalance_prices_xml("2020-03-20")
+    df_test = imbalance_prices_per_min()
     print(df_test)

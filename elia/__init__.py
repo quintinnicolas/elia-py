@@ -31,8 +31,9 @@ URL_IMB_PRICE_EXCEL = 'https://publications.elia.be/Publications/Publications/Im
                       '/GetImbalanceNrvPricesExcel?day=%s '
 URL_IMB_PRICE_XML = "https://publications.elia.be/Publications/Publications/ImbalanceNrvPrice.v1.svc" \
                     "/GetImbalanceNrvPrices?day=%s "
-
-PREFIX = r'{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.ImbalanceNrvPrice.V1}'
+URL_IMB_PRICE_PER_MIN = "https://griddata.elia.be/eliabecontrols.prod/interface/oneminuteimbalance" \
+                            "/SystemImbalancePrice"
+PREFIX_XML = r'{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.ImbalanceNrvPrice.V1}'
 ALPHA = "Alpha"
 BETA = "Beta"
 DATETIME = "DateTime"
@@ -43,6 +44,9 @@ P_NEG = "PNeg"
 P_POS = "PPos"
 SI = "SI"
 COLUMNS = [ALPHA, BETA, MDP, MIP, NRV, SI, P_POS, P_NEG]
+SR = "Sr"
+SSI = "Ssi"
+COLUMNS_PER_MIN = [s.lower() for s in [ALPHA, BETA, MDP, MIP, NRV, SI, P_POS, P_NEG, SR, SI]]
 
 
 # Solar Data
