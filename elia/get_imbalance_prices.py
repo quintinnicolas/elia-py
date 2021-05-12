@@ -37,6 +37,9 @@ def imbalance_prices_xml(date):
         df = pd.DataFrame(dic_imbalance, index=index)
         df.index.name = DATETIME
 
+        # Make sure dataframe is not empty
+        assert len(df)>0
+
         return df
 
 
