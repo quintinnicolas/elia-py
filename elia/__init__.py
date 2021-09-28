@@ -2,6 +2,9 @@
 @author: nicolasquintin
 """
 
+import pytz
+UTC = pytz.timezone("utc")
+
 # Consumption constants
 # Escape % symbol in url doubling the character (%%)
 URL_LOAD_1 = "https://publications.elia.be/Publications/Publications/STLForecasting.v1.svc/ExportSTLFForecastGraph" \
