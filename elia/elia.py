@@ -45,7 +45,7 @@ class EliaClient:
         url = URL_LOAD_1 % (self.dtime_start.strftime(self.DATE_FORMAT), self.dtime_end.strftime(self.DATE_FORMAT))
         df = pd.read_excel(url)
         df.index = pd.to_datetime(df.DateTime, dayfirst=True)
-        df = df.tz_localize("Europe/Brussels").tz_convert("utc")
+        df = df.tz_localize("Europe/Brussels", ambiguous="infer").tz_convert("utc")
         return df
 
     @staticmethod
@@ -77,7 +77,7 @@ class EliaClient:
                 df_price.Date + " " + df_price.Quarter.str[0:5],
                 dayfirst=True
             )
-            df_price.tz_localize("Europe/Brussels").tz_convert("utc")
+            df_price = df_price.tz_localize("Europe/Brussels", ambiguous="infer").tz_convert("utc")
             df.append(df_price)
         df = pd.concat([df_price])
         return df
@@ -105,7 +105,7 @@ class EliaClient:
         # Convert to dataframe
         df = pd.DataFrame(dic_imbalance, index=index)
         df.index.name = DATETIME
-        df = df.tz_localize("Europe/Brussels").tz_convert("utc")
+        df = df.tz_convert("utc")
 
         # Make sure dataframe is not empty
         assert len(df) > 0
