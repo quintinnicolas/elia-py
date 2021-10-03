@@ -1,15 +1,48 @@
-"""
-@author: nicolasquintin
-"""
+import unittest
+import datetime as dt
+from elia.elia import EliaClient
 
-import pandas as pd
-from elia.get_consumption import load_forecast_1
 
-if __name__ == "__main__":
-    dtime_start = pd.to_datetime('20210101', format='%Y%m%d')
-    dtime_end = pd.to_datetime('20210201', format='%Y%m%d')
+class TestEliaClient(unittest.TestCase):
+    end = dt.datetime.today()
+    start = end - dt.timedelta(days=2)
+    client = EliaClient(start, end)
 
-    start = str(dtime_start.date())
-    end = str(dtime_end.date())
-    df = load_forecast_1(start, end)
-    print(df)
+    def test_forecast_wind(self):
+        df = self.client.get_forecast_wind()
+        print(df.tail())
+        self.assertTrue(len(df) > 0)
+
+    def test_forecast_solar(self):
+        df = self.client.get_forecast_solar()
+        print(df.tail())
+        self.assertTrue(len(df) > 0)
+
+    def test_forecast_load(self):
+        df = self.client.get_forecast_load()
+        print(df.tail())
+        self.assertTrue(len(df) > 0)
+
+    def test_actual_imbalance_volume(self):
+        df = self.client.get_actual_imbalance_volume()
+        print(df.tail())
+        self.assertTrue(len(df) > 0)
+
+    def test_actual_imbalance_price_per_quarter(self):
+        df = self.client.get_actual_imbalance_prices_per_quarter()
+        print(df.tail())
+        self.assertTrue(len(df) > 0)
+
+    def test_actual_imbalance_price_per_quarter_via_excel(self):
+        df = self.client.get_actual_imbalance_prices_per_quarter_via_excel()
+        print(df.tail())
+        self.assertTrue(len(df) > 0)
+
+    def test_actual_imbalance_price_per_minute(self):
+        df = self.client.get_actual_imbalance_prices_per_minute()
+        print(df.tail())
+        self.assertTrue(len(df) > 0)
+
+
+if __name__ == '__main__':
+    unittest.main()
