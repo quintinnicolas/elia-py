@@ -28,8 +28,8 @@ class EliaClient:
         with urllib.request.urlopen(url, context=ssl.SSLContext()) as url:
             raw_data = url.read().decode("iso-8859-1")
         xml = ElementTree.fromstring(raw_data)
-        df = self.__parse_xml_to_dataframe(xml)
-        return df
+        df_solar = self.__parse_xml_to_dataframe(xml)
+        return df_solar
 
     def get_forecast_wind(self) -> pd.DataFrame:
         """ returns the wind forecast published by elia """
@@ -37,16 +37,16 @@ class EliaClient:
         with urllib.request.urlopen(url, context=ssl.SSLContext()) as url:
             raw_data = url.read().decode("iso-8859-1")
         xml = ElementTree.fromstring(raw_data)
-        df = self.__parse_xml_to_dataframe(xml)
-        return df
+        df_wind = self.__parse_xml_to_dataframe(xml)
+        return df_wind
 
     def get_forecast_load(self) -> pd.DataFrame:
         """ returns the load forecast published by elia """
         url = URL_LOAD_1 % (self.dtime_start.strftime(self.DATE_FORMAT), self.dtime_end.strftime(self.DATE_FORMAT))
-        df = pd.read_excel(url)
-        df.index = pd.to_datetime(df.DateTime, dayfirst=True)
-        df = df.tz_localize("Europe/Brussels", ambiguous="infer").tz_convert("utc")
-        return df
+        df_load = pd.read_excel(url)
+        df_load.index = pd.to_datetime(df_load.DateTime, dayfirst=True)
+        df_load = df_load.tz_localize("Europe/Brussels", ambiguous="infer").tz_convert("utc")
+        return df_load
 
     @staticmethod
     def get_actual_imbalance_volume() -> pd.DataFrame:
@@ -61,16 +61,16 @@ class EliaClient:
             dtime = UTC.localize(dt.datetime.utcfromtimestamp(timestamp_utc))
             item["Time"] = dtime  # replace item in soup
 
-        df = pd.json_normalize(json_data, "Measurements", "Time")
-        df = pd.pivot_table(df, values="Value", index="Time", columns="Name", dropna=False)
-        df[R3] = df[R3_FLEX] + df[R3_STD]
-        df[AFRR] = df[R2_UP] - df[R2_DOWN] + df[IGCC_UP] - df[IGCC_DOWN]
-        df[MFRR] = df[BIDS_UP] - df[BIDS_DOWN] + df[R3]
-        return df
+        df_imb = pd.json_normalize(json_data, "Measurements", "Time")
+        df_imb = pd.pivot_table(df_imb, values="Value", index="Time", columns="Name", dropna=False)
+        df_imb[R3] = df_imb[R3_FLEX] + df_imb[R3_STD]
+        df_imb[AFRR] = df_imb[R2_UP] - df_imb[R2_DOWN] + df_imb[IGCC_UP] - df_imb[IGCC_DOWN]
+        df_imb[MFRR] = df_imb[BIDS_UP] - df_imb[BIDS_DOWN] + df_imb[R3]
+        return df_imb
 
     def get_actual_imbalance_prices_per_quarter_via_excel(self) -> pd.DataFrame:
         """ returns the imbalance prices on a 15min-basis published by Elia"""
-        df = []
+        df_imb = []
         for date in pd.date_range(self.dtime_start, self.dtime_end, freq="D"):
             df_price = pd.read_excel(URL_IMB_PRICE_EXCEL % date.strftime(self.DATE_FORMAT), header=1)
             df_price.index = pd.to_datetime(
@@ -78,9 +78,9 @@ class EliaClient:
                 dayfirst=True
             )
             df_price = df_price.tz_localize("Europe/Brussels", ambiguous="infer").tz_convert("utc")
-            df.append(df_price)
-        df = pd.concat([df_price])
-        return df
+            df_imb.append(df_price)
+        df_imb = pd.concat([df_price])
+        return df_imb
 
     def get_actual_imbalance_prices_per_quarter(self) -> pd.DataFrame:
         """ returns the imbalance prices on a 15min-basis published by Elia"""
@@ -103,13 +103,13 @@ class EliaClient:
         index = pd.to_datetime([elem.text for elem in elements])
 
         # Convert to dataframe
-        df = pd.DataFrame(dic_imbalance, index=index)
-        df.index.name = DATETIME
-        df = df.tz_convert("utc")
+        df_imb = pd.DataFrame(dic_imbalance, index=index)
+        df_imb.index.name = DATETIME
+        df_imb = df_imb.tz_convert("utc")
 
         # Make sure dataframe is not empty
-        assert len(df) > 0
-        return df.tz_convert(UTC)
+        assert len(df_imb) > 0
+        return df_imb.tz_convert(UTC)
 
     @staticmethod
     def get_actual_imbalance_prices_per_minute() -> pd.DataFrame:
@@ -117,11 +117,11 @@ class EliaClient:
         with urllib.request.urlopen(URL_IMB_PRICE_PER_MIN, context=ssl.SSLContext()) as url:
             json_data = url.read().decode("iso-8859-1")
 
-        df = pd.read_json(json_data)
-        df.index = pd.to_datetime(df.minute)
-        columns_to_drop = [col for col in df.columns if col not in COLUMNS_PER_MIN]
-        df.drop(columns_to_drop, axis=1, inplace=True)
-        return df
+        df_imb = pd.read_json(json_data)
+        df_imb.index = pd.to_datetime(df_imb.minute)
+        columns_to_drop = [col for col in df_imb.columns if col not in COLUMNS_PER_MIN]
+        df_imb.drop(columns_to_drop, axis=1, inplace=True)
+        return df_imb
 
     @staticmethod
     def __parse_xml_to_dataframe(xml: ElementTree.Element) -> pd.DataFrame:
@@ -154,6 +154,6 @@ class EliaClient:
             "day_ahead": day_ahead,
             "real_time": real_time,
         }
-        df = pd.DataFrame(data_dic, index=dtimes)
-        df.index.name = DATETIME
-        return df
+        df_parsed = pd.DataFrame(data_dic, index=dtimes)
+        df_parsed.index.name = DATETIME
+        return df_parsed
