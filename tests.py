@@ -1,6 +1,6 @@
 import unittest
 import datetime as dt
-from elia.elia import EliaClient
+from elia import elia
 
 
 class TestEliaClient(unittest.TestCase):
