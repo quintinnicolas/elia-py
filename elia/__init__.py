@@ -2,19 +2,16 @@
 @author: nicolasquintin
 """
 
-import pytz
-UTC = pytz.timezone("utc")
-
 # Consumption constants
 # Escape % symbol in url doubling the character (%%)
-URL_LOAD_1 = "https://publications.elia.be/Publications/Publications/STLForecasting.v1.svc/ExportSTLFForecastGraph" \
-             "?fromDate=%sT23%%3A00%%3A00.000Z&toDate=%sT23%%3A00%%3A00.000Z "
-URL_LOAD_2 = "https://griddata.elia.be/eliabecontrols.prod/interface/fdn/download/datadownload" \
-             "/0b48be166289678d663e9ed2f3ced7d7 "
+URL_LOAD = r"https://publications.elia.be/Publications/Publications/STLForecasting.v1.svc/ExportSTLFForecastGraph" \
+           r"?fromDate=%sT23%%3A00%%3A00.000Z&toDate=%sT23%%3A00%%3A00.000Z "
+URL_LOAD_BACKUP = r"https://griddata.elia.be/eliabecontrols.prod/interface/fdn/download/datadownload" \
+                  r"/0b48be166289678d663e9ed2f3ced7d7 "
 
 # Imbalance Volume constants
-URL_IMBALANCE = "https://publications.elia.be/Publications/Publications/InternetImbalance.v1.svc" \
-                "/GetImbalanceMeasuresByTime "
+URL_IMBALANCE = r"https://publications.elia.be/Publications/Publications/InternetImbalance.v1.svc" \
+                r"/GetImbalanceMeasuresByTime "
 R3_FLEX = "R3Flex"
 R3_STD = "R3Std"
 R2_UP = "R2Up"
@@ -23,7 +20,6 @@ IGCC_UP = "IGCCUp"
 IGCC_DOWN = "IGCCDown"
 BIDS_UP = "BidsUp"
 BIDS_DOWN = "BidsDown"
-
 R3 = "R3"
 MFRR = "mFRR"
 AFRR = "aFRR"
