@@ -5,12 +5,14 @@ import json
 import re
 import ssl
 import urllib.request
-import pandas as pd
-import datetime as dt
-from numpy import nan
 from xml.etree import ElementTree
+import datetime as dt
+import pandas as pd
+from numpy import nan
+from pytz import timezone
 from elia import *
 
+UTC = timezone("utc")
 
 class EliaClient:
     DATE_FORMAT = "%Y-%m-%d"
