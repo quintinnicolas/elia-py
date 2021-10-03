@@ -19,8 +19,8 @@ class EliaClient:
     ssl._create_default_https_context = ssl._create_unverified_context
 
     def __init__(self,
-                 dtime_start: dt.datetime,
-                 dtime_end: dt.datetime):
+                 dtime_start: dt.datetime = dt.datetime.today(),
+                 dtime_end: dt.datetime = dt.datetime.today() - dt.timedelta(days=1)):
         self.dtime_start = dtime_start
         self.dtime_end = dtime_end
 
