@@ -44,7 +44,7 @@ class EliaClient:
 
     def get_forecast_load(self) -> pd.DataFrame:
         """ Returns the load forecast published by elia """
-        url = URL_LOAD_1 % (self.dtime_start.strftime(self.DATE_FORMAT), self.dtime_end.strftime(self.DATE_FORMAT))
+        url = URL_LOAD % (self.dtime_start.strftime(self.DATE_FORMAT), self.dtime_end.strftime(self.DATE_FORMAT))
         df_load = pd.read_excel(url)
         df_load.index = pd.to_datetime(df_load.DateTime, dayfirst=True)
         df_load = df_load.tz_localize("Europe/Brussels", ambiguous="infer").tz_convert("utc")
@@ -59,7 +59,7 @@ class EliaClient:
         # The format of dtime is '/Date(1632802500000+0200)/'
         # However, this corresponds to epoch in utc timestamp (despite the +0200)!
         for item in json_data:
-            timestamp_utc = int(re.split('\(|\)', item["Time"])[1][:10])
+            timestamp_utc = int(re.split(r"\(|\)", item["Time"])[1][:10])
             dtime = UTC.localize(dt.datetime.utcfromtimestamp(timestamp_utc))
             item["Time"] = dtime  # replace item in soup
 
@@ -96,8 +96,9 @@ class EliaClient:
 
         # Retrieve columns
         dic_imbalance = {}
+        prefix = PREFIX_XML + 'ImbalanceNrvPrices/' + PREFIX_XML + 'ImbalanceNrvPrice/' + PREFIX_XML
         for column in COLUMNS:
-            elements = xml.findall(PREFIX_XML + 'ImbalanceNrvPrices/' + PREFIX_XML + 'ImbalanceNrvPrice/' + PREFIX_XML + column)
+            elements = xml.findall(prefix + column)
             dic_imbalance[column] = [float(elem.text) for elem in elements]
 
         # Retrieve index
