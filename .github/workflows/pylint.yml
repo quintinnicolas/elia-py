@@ -19,4 +19,4 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint **/*.py
+        pylint -d C0301,W0614 **/*.py
