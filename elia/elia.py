@@ -86,23 +86,26 @@ class EliaClient:
 
     def get_actual_imbalance_prices_per_quarter(self) -> pd.DataFrame:
         """Returns the imbalance prices on a 15min-basis published by Elia"""
+        # Download xml output for each day and store the data into a list
+        xmls = []
         for date in pd.date_range(self.dtime_start, self.dtime_end, freq="D"):
             with urllib.request.urlopen(URL_IMB_PRICE_XML % date.strftime(self.DATE_FORMAT), context=ssl.SSLContext()) as url:
                 price_data = url.read().decode("iso-8859-1")
-            try:  # xml variable does already exist
-                xml.append(ElementTree.fromstring(price_data))
-            except NameError:  # xml variable does not exist yet
-                xml = ElementTree.fromstring(price_data)
+            xmls.append(ElementTree.fromstring(price_data))
 
         # Retrieve columns
         dic_imbalance = {}
         prefix = PREFIX_XML + 'ImbalanceNrvPrices/' + PREFIX_XML + 'ImbalanceNrvPrice/' + PREFIX_XML
         for column in COLUMNS:
-            elements = xml.findall(prefix + column)
+            elements = []
+            for xml in xmls:
+                elements += xml.findall(prefix + column)  # Concatenate lists
             dic_imbalance[column] = [float(elem.text) for elem in elements]
 
         # Retrieve index
-        elements = xml.findall(PREFIX_XML + 'ImbalanceNrvPrices/' + PREFIX_XML + 'ImbalanceNrvPrice/' + PREFIX_XML + DATETIME)
+        elements = []
+        for xml in xmls:
+            elements += xml.findall(prefix + DATETIME)  # Concatenate lists
         index = pd.to_datetime([elem.text for elem in elements])
 
         # Convert to dataframe
