@@ -25,7 +25,7 @@ class EliaClient:
         self.dtime_end = dtime_end
 
     def get_forecast_solar(self) -> pd.DataFrame:
-        """ Returns the solar forecast from elia """
+        """Returns the solar forecast from elia"""
         url = URL_SOLAR % (self.dtime_start.strftime(self.DATE_FORMAT),  self.dtime_end.strftime(self.DATE_FORMAT))
         with urllib.request.urlopen(url, context=ssl.SSLContext()) as url:
             raw_data = url.read().decode("iso-8859-1")
@@ -34,7 +34,7 @@ class EliaClient:
         return df_solar
 
     def get_forecast_wind(self) -> pd.DataFrame:
-        """ Returns the wind forecast published by elia """
+        """Returns the wind forecast published by elia"""
         url = URL_WIND % (self.dtime_start.strftime(self.DATE_FORMAT),  self.dtime_end.strftime(self.DATE_FORMAT))
         with urllib.request.urlopen(url, context=ssl.SSLContext()) as url:
             raw_data = url.read().decode("iso-8859-1")
@@ -43,7 +43,7 @@ class EliaClient:
         return df_wind
 
     def get_forecast_load(self) -> pd.DataFrame:
-        """ Returns the load forecast published by elia """
+        """Returns the load forecast published by elia"""
         url = URL_LOAD % (self.dtime_start.strftime(self.DATE_FORMAT), self.dtime_end.strftime(self.DATE_FORMAT))
         df_load = pd.read_excel(url)
         df_load.index = pd.to_datetime(df_load.DateTime, dayfirst=True)
@@ -52,7 +52,7 @@ class EliaClient:
 
     @staticmethod
     def get_actual_imbalance_volume() -> pd.DataFrame:
-        """ Returns the latest imbalance measurements published by Elia"""
+        """Returns the latest imbalance measurements published by Elia"""
         with urllib.request.urlopen(URL_IMBALANCE, context=ssl.SSLContext()) as url:
             json_data = json.loads(url.read().decode())
 
@@ -71,7 +71,7 @@ class EliaClient:
         return df_imb
 
     def get_actual_imbalance_prices_per_quarter_via_excel(self) -> pd.DataFrame:
-        """ Returns the imbalance prices on a 15min-basis published by Elia"""
+        """Returns the imbalance prices on a 15min-basis published by Elia"""
         df_imb = []
         for date in pd.date_range(self.dtime_start, self.dtime_end, freq="D"):
             df_price = pd.read_excel(URL_IMB_PRICE_EXCEL % date.strftime(self.DATE_FORMAT), header=1)
@@ -85,7 +85,7 @@ class EliaClient:
         return df_imb
 
     def get_actual_imbalance_prices_per_quarter(self) -> pd.DataFrame:
-        """ Returns the imbalance prices on a 15min-basis published by Elia"""
+        """Returns the imbalance prices on a 15min-basis published by Elia"""
         for date in pd.date_range(self.dtime_start, self.dtime_end, freq="D"):
             with urllib.request.urlopen(URL_IMB_PRICE_XML % date.strftime(self.DATE_FORMAT), context=ssl.SSLContext()) as url:
                 price_data = url.read().decode("iso-8859-1")
@@ -116,7 +116,7 @@ class EliaClient:
 
     @staticmethod
     def get_actual_imbalance_prices_per_minute() -> pd.DataFrame:
-        """ Returns the imbalance prices on a 1min-basis published by Elia"""
+        """Returns the imbalance prices on a 1min-basis published by Elia"""
         with urllib.request.urlopen(URL_IMB_PRICE_PER_MIN, context=ssl.SSLContext()) as url:
             json_data = url.read().decode("iso-8859-1")
 
@@ -128,7 +128,7 @@ class EliaClient:
 
     @staticmethod
     def __parse_xml_to_dataframe(xml: ElementTree.Element) -> pd.DataFrame:
-        """ Retrieves relevant elements in the soup and parses the data into a DataFrame"""
+        """Retrieves relevant elements in the soup and parses the data into a DataFrame"""
         if "WindForecasting" in str(xml):
             webservice = '{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.WindForecasting.v2}'
             prefix = webservice + 'ForecastGraphItems/' + webservice + 'WindForecastingGraphItem/'
