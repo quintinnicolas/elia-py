@@ -81,7 +81,7 @@ class EliaClient:
             )
             df_price = df_price.tz_localize("Europe/Brussels", ambiguous="infer").tz_convert("utc")
             df_imb.append(df_price)
-        df_imb = pd.concat([df_price])
+        df_imb = pd.concat(df_imb)
         return df_imb
 
     def get_actual_imbalance_prices_per_quarter(self) -> pd.DataFrame:
