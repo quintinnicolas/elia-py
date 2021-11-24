@@ -148,10 +148,13 @@ class EliaClient:
             day_ahead = xml.findall(prefix + webservice + 'DayAheadForecast')
             dtimes = xml.findall(prefix + webservice + 'StartsOn/' + '{http://schemas.datacontract.org/2004/07/System}DateTime')
 
-        # List comprehension to format data
-        real_time = [float(elem.text) if float(elem.text) != -50 else nan for elem in real_time]
-        most_recent = [float(elem.text) if float(elem.text) != -50 else nan for elem in most_recent]
-        day_ahead = [float(elem.text) if float(elem.text) != -50 else nan for elem in day_ahead]
+        # List comprehension to format data float(elem.text) != -50
+        real_time = [float(elem.text) if elem.text is not None else nan for elem in real_time]
+        real_time = [value if value != -50 else nan for value in real_time]  # -50 holds for NaN
+        most_recent = [float(elem.text) if elem.text is not None else nan for elem in most_recent]
+        most_recent = [value if value != -50 else nan for value in most_recent]  # -50 holds for NaN
+        day_ahead = [float(elem.text) if elem.text is not None else nan for elem in day_ahead]
+        day_ahead = [value if value != -50 else nan for value in day_ahead]  # -50 holds for NaN
         dtimes = pd.to_datetime([elem.text for elem in dtimes])
 
         # Build DataFrame
