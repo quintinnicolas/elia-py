@@ -110,7 +110,7 @@ class EliaClient:
 
         # Convert to dataframe
         df_imb = pd.DataFrame(dic_imbalance, index=index)
-        df_imb.index.name = DATETIME
+        df_imb.index = df_imb.index.map(lambda x: x.astimezone(UTC))  # Add fix for months with DST - timezone needs to be changed row per row
         df_imb = df_imb.tz_convert("utc")
 
         # Make sure dataframe is not empty
