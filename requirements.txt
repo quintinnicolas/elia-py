@@ -3,3 +3,4 @@ pandas
 xlrd
 pytz
 pytest
+requests
