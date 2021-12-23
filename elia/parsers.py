@@ -1,11 +1,12 @@
 """
 Author: nicolasquintin
 """
-from xml.etree import ElementTree
 from typing import List
-from pytz import timezone
+from xml.etree import ElementTree
+
 import pandas as pd
 from numpy import nan
+from pytz import timezone
 
 UTC = timezone("utc")
 
@@ -21,7 +22,8 @@ def parse_renewable_xml(xml: ElementTree.Element) -> pd.DataFrame:
         real_time = xml.findall(prefix + webservice + 'Realtime')
         most_recent = xml.findall(prefix + webservice + 'MostRecentForecast')
         day_ahead = xml.findall(prefix + webservice + 'DayAheadForecast')
-        dtimes = xml.findall(prefix + webservice + 'StartsOn/' + '{http://schemas.datacontract.org/2004/07/System}DateTime')
+        dtimes = xml.findall(
+            prefix + webservice + 'StartsOn/' + '{http://schemas.datacontract.org/2004/07/System}DateTime')
 
     elif "SolarForecasting" in str(xml):
         webservice = '{http://schemas.datacontract.org/2004/07/Elia.PublicationService.DomainInterface.SolarForecasting.v4}'
@@ -29,7 +31,8 @@ def parse_renewable_xml(xml: ElementTree.Element) -> pd.DataFrame:
         real_time = xml.findall(prefix + webservice + 'RealTime')
         most_recent = xml.findall(prefix + webservice + 'MostRecentForecast')
         day_ahead = xml.findall(prefix + webservice + 'DayAheadForecast')
-        dtimes = xml.findall(prefix + webservice + 'StartsOn/' + '{http://schemas.datacontract.org/2004/07/System}DateTime')
+        dtimes = xml.findall(
+            prefix + webservice + 'StartsOn/' + '{http://schemas.datacontract.org/2004/07/System}DateTime')
 
     # List comprehension to format data where float(elem.text) != -50, since -50 holds for NaN
     real_time = [float(elem.text) if elem.text is not None else nan for elem in real_time]
@@ -75,7 +78,8 @@ def parse_imbalance_xmls(xmls: List[ElementTree.Element]) -> pd.DataFrame:
 
     # Convert to dataframe
     df_imb = pd.DataFrame(dic_imbalance, index=index)
-    df_imb.index = df_imb.index.map(lambda x: x.astimezone(UTC))  # Fix for months with DST -> timezone needs to be changed row per row
+    df_imb.index = df_imb.index.map(
+        lambda x: x.astimezone(UTC))  # Fix for months with DST -> timezone needs to be changed row per row
     df_imb = df_imb.tz_convert("utc")
     df_imb.index.name = "DateTime"
     return df_imb
