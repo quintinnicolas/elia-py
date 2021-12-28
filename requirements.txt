@@ -1,6 +1,7 @@
+requests
 numpy
 pandas
-xlrd
 pytz
 pytest
 requests
+xlrd
