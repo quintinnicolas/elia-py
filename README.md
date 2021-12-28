@@ -11,7 +11,7 @@ pip install elia-py
 ### Usage
 ```python
 import datetime as dt
-import elia
+from elia import elia
 
 connection = elia.EliaPandasClient()
 start = dt.datetime(2021,1,1)
