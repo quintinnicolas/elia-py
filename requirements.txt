@@ -3,4 +3,5 @@ numpy
 pandas
 pytz
 pytest
+requests
 xlrd
