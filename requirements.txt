@@ -1,5 +1,5 @@
+requests
 numpy
 pandas
-xlrd
 pytz
 pytest
