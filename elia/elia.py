@@ -5,23 +5,60 @@ import datetime as dt
 import json
 import re
 from xml.etree import ElementTree
+from typing import Optional
 
 import pandas as pd
 import requests
 from pytz import timezone
 
-from elia.constants import ENDPOINT_LOAD, ENDPOINT_IMBALANCE_VOLUME, ENDPOINT_IMBALANCE_PRICE_EXCEL, \
-    ENDPOINT_IMBALANCE_PRICE, ENDPOINT_IMBALANCE_PRICE_PER_MIN, ENDPOINT_SOLAR, ENDPOINT_WIND
-from elia.parsers import parse_renewable_xml, parse_imbalance_xmls
-
 UTC = timezone("utc")
 DATE_FORMAT = "%Y-%m-%d"
 
+__version__ = "0.1.0"
+
 
 class EliaPandasClient:
+    BASE_URL = r"https://opendata.elia.be/api/v2"
+    ENDPOINT = r"/catalog/datasets/%s/records/"
 
     def __init__(self):
         pass
+
+    def get_current_system_imbalance(self, **params) -> pd.DataFrame:
+        """Returns the current system imbalance data published by Elia"""
+
+        params.update({"dataset": "ods088"})
+        df = self._execute_query(params)
+        df = self._process_results(df)
+        return df
+
+    def _execute_query(self, params: dict) -> pd.DataFrame:
+        """Executes the query and return raw DataFrame"""
+
+        response = requests.get(self.BASE_URL + self.ENDPOINT % params["dataset"], params=params)
+        json_data = json.loads(response.text)
+        df = pd.json_normalize(json_data, record_path=["records"])
+        return df
+
+    @staticmethod
+    def _process_results(df) -> pd.DataFrame:
+        """Processes and cleans the DataFrame"""
+
+        # Keep only the necessary columns
+        cols = [col for col in df.columns if "record.fields." in col]
+        cols.append("record.timestamp")  # Add query time
+        df = df[cols]
+
+        # Rename columns
+        mapping_cols = {col: col.split(".")[-1] for col in df.columns}
+        df = df.rename(columns=mapping_cols)
+
+        # Handle datetimes
+        df["datetime"] = pd.to_datetime(df["datetime"])
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+        df = df.set_index("datetime").sort_index()
+
+        return df
 
     @staticmethod
     def get_forecast_solar(start: dt.datetime, end: dt.datetime, **kwargs) -> pd.DataFrame:
@@ -31,10 +68,10 @@ class EliaPandasClient:
             "dateTo": end.strftime(DATE_FORMAT),
             "sourceId": kwargs.get("source_id", 1),
         }
-        response = requests.get(ENDPOINT_SOLAR, params=params)
+        response = requests.get("", params=params)
         xml = ElementTree.fromstring(response.text)
-        df_solar = parse_renewable_xml(xml)
-        return df_solar
+        # df_solar = parse_renewable_xml(xml)
+        # return df_solar
 
     @staticmethod
     def get_forecast_wind(start: dt.datetime, end: dt.datetime, **kwargs) -> pd.DataFrame:
@@ -45,10 +82,10 @@ class EliaPandasClient:
             "isOffshore": kwargs.get("is_offshore", 1),
             "isEliaConnected": kwargs.get("is_elia_connected", ""),
         }
-        response = requests.get(ENDPOINT_WIND, params=params)
+        response = requests.get("", params=params)
         xml = ElementTree.fromstring(response.text)
-        df_wind = parse_renewable_xml(xml)
-        return df_wind
+        # df_wind = parse_renewable_xml(xml)
+        # return df_wind
 
     @staticmethod
     def get_forecast_load(start: dt.datetime, end: dt.datetime) -> pd.DataFrame:
@@ -57,7 +94,7 @@ class EliaPandasClient:
             "fromDate": start.isoformat(),
             "toDate": end.isoformat(),
         }
-        url = requests.Request("GET", ENDPOINT_LOAD, params=params).prepare()
+        url = requests.Request("GET", "", params=params).prepare()
         df_load = pd.read_excel(url.url)
         df_load.index = pd.to_datetime(df_load.DateTime, dayfirst=True)
         df_load = df_load.tz_localize("Europe/Brussels", ambiguous="infer").tz_convert("utc")
@@ -66,7 +103,7 @@ class EliaPandasClient:
     @staticmethod
     def get_actual_imbalance_volume() -> pd.DataFrame:
         """Returns the latest imbalance measurements published by Elia"""
-        response = requests.get(ENDPOINT_IMBALANCE_VOLUME)
+        response = requests.get("")
         json_data = json.loads(response.text)
 
         # The format of dtime is '/Date(1632802500000+0200)/'
@@ -95,7 +132,7 @@ class EliaPandasClient:
             params = {
                 "day": date.strftime(DATE_FORMAT)
             }
-            url = requests.Request("GET", ENDPOINT_IMBALANCE_PRICE_EXCEL, params=params).prepare()
+            url = requests.Request("GET", "", params=params).prepare()
             df_price = pd.read_excel(url.url, header=1)
 
             # A bit of post-processing
@@ -116,17 +153,23 @@ class EliaPandasClient:
             params = {
                 "day": date.strftime(DATE_FORMAT)
             }
-            response = requests.get(ENDPOINT_IMBALANCE_PRICE, params=params)
+            response = requests.get("", params=params)
             xmls.append(ElementTree.fromstring(response.text))
-        df_imb = parse_imbalance_xmls(xmls)
-        assert len(df_imb) > 0  # Make sure dataframe is not empty
-        return df_imb
+        # df_imb = parse_imbalance_xmls(xmls)
+        # assert len(df_imb) > 0  # Make sure dataframe is not empty
+        # return df_imb
 
     @staticmethod
     def get_actual_imbalance_prices_per_minute() -> pd.DataFrame:
         """Returns the imbalance prices on a 1min-basis published by Elia"""
-        response = requests.get(ENDPOINT_IMBALANCE_PRICE_PER_MIN)
+        response = requests.get("")
         json_data = json.loads(response.text)
         df_imb = pd.json_normalize(json_data)
         df_imb.index = pd.to_datetime(df_imb.minute)
         return df_imb
+
+
+if __name__ == "__main__":
+    client = EliaPandasClient()
+    df = client.get_current_system_imbalance(rows=100)
+    print(df)

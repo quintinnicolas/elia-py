@@ -17,13 +17,28 @@ df = pd.json_normalize(json_data, record_path=["datasets"], max_level=1)
 print(df.info())
 
 
+DATASET_ID = "ods088"
+ENDPOINT = rf"/catalog/datasets/{DATASET_ID}/records/"
 params = {
-    "dataset": ["ods088"],
-    "rows": 10,
-    "start": 0,
-    "facet": ["datetime", "resolutioncode"],
-    "format": "json",
-    "timezone": "UTC"
+    "dataset": [DATASET_ID],
+    "limit": 10,
 }
 
-response = requests.get(BASE_URL + ENDPOINT)
+# Record_path is supposed to point to an array of objects
+response = requests.get(BASE_URL + ENDPOINT, params=params)
+json_data = json.loads(response.text)
+df = pd.json_normalize(json_data, record_path=["records"])
+
+# Keep only the necessary columns
+cols = [col for col in df.columns if "record.fields." in col]
+cols.append("record.timestamp")  # Add query time
+df = df[cols]
+
+# Rename columns
+mapping_cols = {col: col.split(".")[-1] for col in cols}
+df = df.rename(columns=mapping_cols)
+
+# Handle datetimes!
+df["datetime"] = pd.to_datetime(df["datetime"])
+df["timestamp"] = pd.to_datetime(df["timestamp"])
+df = df.set_index("datetime").sort_index()
