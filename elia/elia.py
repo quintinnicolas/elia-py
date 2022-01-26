@@ -1,18 +1,16 @@
 """
-Author: nicolasquintin
+@author: nicolasquintin
 """
-import datetime as dt
 import json
+import logging
+import datetime as dt
 
 import pandas as pd
 import requests
 
-from decorators import split_in_chunks
-
-DATE_FORMAT = "%Y-%m-%d"
-DATETIME_FORMAT = "%Y-%m-%d %H:%S"
-
-__version__ = "0.1.0"
+from constants import DATETIME_FORMAT
+from decorators import split_along_time, split_in_chunks_if_too_long
+from exceptions import TooManyRowsError, EmptyQueryError
 
 
 class EliaPandasClient:
@@ -38,12 +36,24 @@ class EliaPandasClient:
         df = self._process_results(df)
         return df
 
-    @split_in_chunks("24h")
+    @split_along_time("24h")
     def get_imbalance_prices_per_quarter_hour(self, start: dt.datetime, end: dt.datetime, rows: int = 100, **params) -> pd.DataFrame:
         """Returns the imbalance prices per 15min"""
         dataset = "ods047"
         date_filter = f"datetime IN [date'{start.strftime(DATETIME_FORMAT)}'..date'{end.strftime(DATETIME_FORMAT)}'["
         params.update({"where": date_filter, "rows": rows})
+        df = self._execute_query(dataset, params)
+        df = self._process_results(df)
+        return df
+
+    @split_along_time("4h")
+    @split_in_chunks_if_too_long(4)
+    def get_solar_forecast(self, start: dt.datetime, end: dt.datetime, rows: int = 100, region: str = None, **params) -> pd.DataFrame:
+        """Returns the measured and upscaled photovoltaic power generation on the Belgian grid."""
+        dataset = "ods032"
+        date_filter = f"datetime IN [date'{start.strftime(DATETIME_FORMAT)}'..date'{end.strftime(DATETIME_FORMAT)}'["
+        region_filter = f"AND region = '{region}'" if region is not None else ""
+        params.update({"where": date_filter + " " + region_filter, "rows": rows})
         df = self._execute_query(dataset, params)
         df = self._process_results(df)
         return df
@@ -59,26 +69,36 @@ class EliaPandasClient:
     def _process_results(df: pd.DataFrame) -> pd.DataFrame:
         """Processes and cleans the DataFrame"""
 
-        # Keep only the necessary columns
-        cols = [col for col in df.columns if "record.fields." in col]
-        cols.append("record.timestamp")  # Add query time
-        df = df[cols]
+        if len(df) >= 100:
+            raise TooManyRowsError("The request reached the maximum number of rows imposed by the API."
+                                   "Your query response will very likely contain some missing data. Please be careful!")
 
-        # Rename columns
-        mapping_cols = {col: col.split(".")[-1] for col in df.columns}
-        df = df.rename(columns=mapping_cols)
+        if len(df) > 0:
+            # Keep only the necessary columns
+            cols = [col for col in df.columns if "record.fields." in col]
+            cols.append("record.timestamp")  # Add query time
+            df = df[cols]
 
-        # Handle datetimes
-        df["datetime"] = pd.to_datetime(df["datetime"])
-        df["timestamp"] = pd.to_datetime(df["timestamp"])
-        df = df.set_index("datetime").sort_index()
+            # Rename columns
+            mapping_cols = {col: col.split(".")[-1] for col in df.columns}
+            df = df.rename(columns=mapping_cols)
+
+            # Handle datetimes
+            df["datetime"] = pd.to_datetime(df["datetime"])
+            df["timestamp"] = pd.to_datetime(df["timestamp"])
+            df = df.set_index("datetime").sort_index()
 
         return df
 
+    @staticmethod
+    def __sanity_check(df: pd.DataFrame) -> None:
+        """Checks if the dataframe looks healthy"""
+
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     client = EliaPandasClient()
-    start = dt.datetime(2022, 1, 1)
-    end = dt.datetime(2022, 1, 15, 19)
-    df = client.get_imbalance_prices_per_quarter_hour(start=start, end=end)
+    start_ = dt.datetime(2022, 1, 20)
+    end_ = dt.datetime(2022, 1, 21, 19)
+    df = client.get_solar_forecast(start=start_, end=end_, region="Brussels")
     print(df)
