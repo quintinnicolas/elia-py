@@ -1,15 +1,12 @@
-import pytest
 import datetime as dt
+import pytest
 from elia import elia
-from pytz import timezone
 
-BRU = timezone("Europe/Brussels")
+start_1 = dt.datetime.today() - dt.timedelta(days=40)
+end_1 = dt.datetime.today() - dt.timedelta(days=-1)
 
-start_1 = dt.datetime.today() - dt.timedelta(days=2)
-end_1 = dt.datetime.today() - dt.timedelta(days=1)
-
-start_2 = dt.datetime.now(tz=BRU) - dt.timedelta(hours=24)
-end_2 = dt.datetime.now(tz=BRU)
+start_2 = dt.datetime.utcnow() - dt.timedelta(hours=12)
+end_2 = dt.datetime.utcnow() + dt.timedelta(hours=12)
 
 
 @pytest.fixture()
@@ -19,59 +16,50 @@ def connection() -> elia.EliaPandasClient:
 
 
 @pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
-def test_forecast_wind(connection, start, end):
+def test_historical_wind_power_estimation_and_forecast(connection, start, end):
     """Testing wind query"""
-    df_test = connection.get_forecast_wind(start, end)
+    df_test = connection.get_historical_wind_power_estimation_and_forecast(start=start, end=end)
     number_of_quarter_hours = (end-start).days * 24 * 4 + (end-start).seconds // 900
     print(df_test.tail())
-    assert(len(df_test) >= number_of_quarter_hours)
+    assert(df_test.index.nunique() >= number_of_quarter_hours)
 
 
 @pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
-def test_forecast_solar(connection, start, end):
+def test_historical_solar_power_estimation_and_forecast(connection, start, end):
     """Testing solar query"""
-    df_test = connection.get_forecast_solar(start, end)
+    df_test = connection.get_historical_solar_power_estimation_and_forecast(start=start, end=end)
     number_of_quarter_hours = (end-start).days * 24 * 4 + (end-start).seconds // 900
     print(df_test.tail())
-    assert(len(df_test) >= number_of_quarter_hours)
+    assert(df_test.index.nunique() >= number_of_quarter_hours)
 
 
 @pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
-def test_forecast_load(connection, start, end):
+def test_load_on_elia_grid(connection, start, end):
     """Testing consumption query"""
-    df_test = connection.get_forecast_load(start, end)
+    df_test = connection.get_load_on_elia_grid(start=start, end=end)
     number_of_quarter_hours = (end-start).days * 24 * 4 + (end-start).seconds // 900
     print(df_test.tail())
-    assert(len(df_test) >= number_of_quarter_hours)
+    assert(df_test.index.nunique() >= number_of_quarter_hours)
 
 
 @pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
-def test_actual_imbalance_price_per_quarter(connection, start, end):
+def test_imbalance_prices_per_quarter(connection, start, end):
     """Testing imbalance price query"""
-    df_test = connection.get_actual_imbalance_prices_per_quarter(start, end)
+    df_test = connection.get_imbalance_prices_per_quarter_hour(start=start, end=end)
     number_of_quarter_hours = (end-start).days * 24 * 4 + (end-start).seconds // 900
     print(df_test.tail())
-    assert(len(df_test) >= number_of_quarter_hours)
+    assert(df_test.index.nunique() >= number_of_quarter_hours)
 
 
-@pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
-def test_actual_imbalance_price_per_quarter_via_excel(connection, start, end):
+def test_imbalance_prices_per_min(connection):
     """Testing imbalance price query"""
-    df_test = connection.get_actual_imbalance_prices_per_quarter_via_excel(start, end)
-    number_of_quarter_hours = (end-start).days * 24 * 4 + (end-start).seconds // 900
+    df_test = connection.get_imbalance_prices_per_min()
     print(df_test.tail())
-    assert(len(df_test) >= number_of_quarter_hours)
+    assert(df_test.index.nunique() >= 59)  # data per minute, only for the latest hour
 
 
-def test_actual_imbalance_volume(connection):
+def test_current_system_imbalance(connection):
     """Testing imbalance volume query"""
-    df_test = connection.get_actual_imbalance_volume()
+    df_test = connection.get_current_system_imbalance()
     print(df_test.tail())
-    assert(len(df_test) >= 59)  # data per minute, only for the latest hour
-
-
-def test_actual_imbalance_price_per_minute(connection):
-    """Testing imbalance price query"""
-    df_test = connection.get_actual_imbalance_prices_per_minute()
-    print(df_test.tail())
-    assert(len(df_test) >= 59)  # data per minute, only for the latest hour
+    assert(df_test.index.nunique() >= 59)  # data per minute, only for the latest hour

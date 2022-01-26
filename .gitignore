@@ -1,6 +1,7 @@
 *.pyc
 .idea
 .DS_Store
+.venv/
 
 # Distribution / packaging
 build/
