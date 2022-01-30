@@ -1,7 +1,8 @@
 # elia-py
-Python 3 client for the Elia web services, the Belgian Transmission System Operator.
-For more information about the web services, please refer to 
-[this page](https://www.elia.be/en/customers/customer-tools-and-extranet/the-b2b-xml-service).
+Simple Python 3 client for the Elia Open Data API 🤖
+
+For more information about the Elia Open Data Platform, please refer to 
+[https://opendata.elia.be/](https://opendata.elia.be/).
 
 ### Installation
 ```shell
@@ -14,9 +15,11 @@ import datetime as dt
 from elia import elia
 
 connection = elia.EliaPandasClient()
-start = dt.datetime(2021,1,1)
-end = dt.datetime(2021,1,5)
+start = dt.datetime(2022, 1, 1)
+end = dt.datetime(2022, 1, 15)
 
-df = connection.get_forecast_solar(start, end)
+df = connection.get_imbalance_prices_per_quarter_hour(start=start, end=end)
 ```
-
+### Notes
+This work has been inspired by a similar project `entsoe-py` available on 
+[GitHub](https://github.com/EnergieID/entsoe-py).
