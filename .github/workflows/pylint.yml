@@ -19,4 +19,4 @@ jobs:
         pip install pylint
     - name: Analyse code with pylint
       run: |
-        pylint -d C0301,W0614 --fail-under=8 **/*.py
+        pylint -d W0613 --fail-under=8 --rcfile=.pylintrc **/*.py

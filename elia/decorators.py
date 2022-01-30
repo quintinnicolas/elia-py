@@ -8,8 +8,8 @@ import pandas as pd
 
 
 def split_along_time(freq: str):
-    """Splits the query into multiple sub queries, with smaller time windows. Allowed split frequencies are available
-    here: https://pandas.pydata.org/docs/user_guide/timeseries.html#timeseries-offset-aliases"""
+    """Splits the query into multiple sub queries, with smaller time windows. Allowed split frequencies are
+    available here: https://pandas.pydata.org/docs/user_guide/timeseries.html#timeseries-offset-aliases"""
     def decorator(func):
         @wraps(func)
         def wrapper(*args, start, end, **kwargs):
