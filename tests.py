@@ -3,19 +3,28 @@ import pytest
 from elia import elia
 
 start_1 = dt.datetime.today() - dt.timedelta(days=10)
-end_1 = dt.datetime.today() - dt.timedelta(days=-1)
-
-start_2 = dt.datetime.utcnow() - dt.timedelta(hours=12)
-end_2 = dt.datetime.utcnow() + dt.timedelta(hours=12)
+end_1 = dt.datetime.today() - dt.timedelta(days=1)
 
 
 @pytest.fixture()
 def connection() -> elia.EliaPandasClient:
-    """Creates EliaClient object"""
+    """Creates EliaPandasClient object"""
     return elia.EliaPandasClient()
 
 
-@pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
+def test_wind_power_estimation_and_forecast(connection):
+    """Testing wind query"""
+    df_test = connection.get_solar_power_estimation_and_forecast()
+    print(df_test)
+
+
+def test_solar_power_estimation_and_forecast(connection):
+    """Testing solar query"""
+    df_test = connection.get_solar_power_estimation_and_forecast()
+    print(df_test)
+
+
+@pytest.mark.parametrize("start, end", [(start_1, end_1)])
 def test_historical_wind_power_estimation_and_forecast(connection, start, end):
     """Testing wind query"""
     df_test = connection.get_historical_wind_power_estimation_and_forecast(start=start, end=end)
@@ -24,7 +33,7 @@ def test_historical_wind_power_estimation_and_forecast(connection, start, end):
     assert(df_test.index.nunique() >= number_of_quarter_hours)
 
 
-@pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
+@pytest.mark.parametrize("start, end", [(start_1, end_1)])
 def test_historical_solar_power_estimation_and_forecast(connection, start, end):
     """Testing solar query"""
     df_test = connection.get_historical_solar_power_estimation_and_forecast(start=start, end=end)
@@ -33,16 +42,16 @@ def test_historical_solar_power_estimation_and_forecast(connection, start, end):
     assert(df_test.index.nunique() >= number_of_quarter_hours)
 
 
-@pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
+@pytest.mark.parametrize("start, end", [(start_1, end_1)])
 def test_load_on_elia_grid(connection, start, end):
-    """Testing consumption query"""
+    """Testing load query"""
     df_test = connection.get_load_on_elia_grid(start=start, end=end)
     number_of_quarter_hours = (end-start).days * 24 * 4 + (end-start).seconds // 900
     print(df_test)
     assert(df_test.index.nunique() >= number_of_quarter_hours)
 
 
-@pytest.mark.parametrize("start, end", [(start_1, end_1), (start_2, end_2)])
+@pytest.mark.parametrize("start, end", [(start_1, end_1)])
 def test_imbalance_prices_per_quarter(connection, start, end):
     """Testing imbalance price query"""
     df_test = connection.get_imbalance_prices_per_quarter_hour(start=start, end=end)

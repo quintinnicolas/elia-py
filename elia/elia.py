@@ -1,9 +1,8 @@
 """
 @author: nicolasquintin
-@source: The documentation is available here: https://opendata.elia.be/explore/
+@source: The API documentation is available here: https://opendata.elia.be/explore/
 """
 import json
-import logging
 import datetime as dt
 
 import pandas as pd
@@ -119,12 +118,3 @@ class EliaPandasClient:
         df["datetime"] = pd.to_datetime(df["datetime"])
         df = df.set_index("datetime").sort_index()
         return df
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
-    client = EliaPandasClient()
-    start_ = dt.datetime(2021, 12, 9)
-    end_ = dt.datetime(2022, 1, 30, 12)
-    df_ = client.get_load_on_elia_grid(start=start_, end=end_)
-    print(df_)
