@@ -1,6 +1,5 @@
 """
 @author: nicolasquintin
-@source: The API documentation is available here: https://opendata.elia.be/explore/
 """
 import json
 import datetime as dt

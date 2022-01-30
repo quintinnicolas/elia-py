@@ -18,7 +18,7 @@ connection = elia.EliaPandasClient()
 start = dt.datetime(2022, 1, 1)
 end = dt.datetime(2022, 1, 15)
 
-df = connection.get_forecast_solar(start, end)
+df = connection.get_imbalance_prices_per_quarter_hour(start=start, end=end)
 ```
 ### Notes
 This work has been inspired by a similar project `entsoe-py` available on 
