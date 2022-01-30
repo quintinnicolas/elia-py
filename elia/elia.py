@@ -133,8 +133,8 @@ class EliaPandasClient:
         region = kwargs.get('region')
         params = kwargs.get('params')
 
-        date_filter = f"datetime IN [date'{start.strftime(DATETIME_FORMAT)}'..date'{end.strftime(DATETIME_FORMAT)}'[" \
-            if (start and end) else None
+        date_filter = f"datetime IN [date'{start.strftime(DATETIME_FORMAT)}'" \
+                      f"..date'{end.strftime(DATETIME_FORMAT)}'[" if (start and end) else None
         region_filter = f"region = '{region}'" if region else None
         params_filter = params.get('where') if params else None
 
