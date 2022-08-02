@@ -43,6 +43,24 @@ def test_historical_solar_power_estimation_and_forecast(connection, start, end):
 
 
 @pytest.mark.parametrize("start, end", [(start_1, end_1)])
+def test_historical_power_generation_by_fuel_type(connection, start, end):
+    """Testing generation query"""
+    df_test = connection.get_historical_power_generation_by_fuel_type(start=start, end=end)
+    number_of_quarter_hours = (end-start).days * 24 * 4 + (end-start).seconds // 900
+    print(df_test)
+    assert(df_test.index.nunique() >= number_of_quarter_hours)
+
+
+@pytest.mark.parametrize("start, end", [(start_1, end_1)])
+def test_installed_capacity_by_fuel_type(connection, start, end):
+    """Testing installed capacity query"""
+    df_test = connection.get_installed_capacity_by_fuel_type(start=start, end=end)
+    number_of_days = (end-start).days - 1
+    print(df_test)
+    assert(df_test.index.nunique() >= number_of_days)
+
+
+@pytest.mark.parametrize("start, end", [(start_1, end_1)])
 def test_load_on_elia_grid(connection, start, end):
     """Testing load query"""
     df_test = connection.get_load_on_elia_grid(start=start, end=end)

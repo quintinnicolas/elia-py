@@ -15,6 +15,8 @@ def split_along_time(freq: str):
         def wrapper(*args, start, end, **kwargs):
             # dates = pd.date_range(start, end, freq=freq, inclusive="left")  # Python 3.10
             dates = pd.date_range(start, end, freq=freq, closed="left")  # Python 3.9 or below
+            if len(dates) == 0:
+                dates = dates.insert(len(dates), start)
             dates = dates.insert(len(dates), end)
             dfs = []
             for _start, _end in _pairwise(dates):

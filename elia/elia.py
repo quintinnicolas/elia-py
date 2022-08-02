@@ -119,6 +119,36 @@ class EliaPandasClient:
         df = self._process_results(df)
         return df
 
+    @split_along_time("5D")
+    def get_historical_power_generation_by_fuel_type(
+            self,
+            start: dt.datetime | dt.date | pd.Timestamp = YESTERDAY,
+            end: dt.datetime | dt.date | pd.Timestamp = TODAY,
+            fuel: str = None,
+            **params) -> pd.DataFrame:
+        """Returns the measured power generation on the Belgian grid by fuel type."""
+        dataset = "ods033"
+        where_filter = self._construct_where_filter(**locals())
+        params.update({"where": where_filter})
+        df = self._execute_query(dataset, params)
+        df = self._process_results(df)
+        return df
+
+    @split_along_time("5M")
+    def get_installed_capacity_by_fuel_type(
+            self,
+            start: dt.datetime | dt.date | pd.Timestamp = YESTERDAY,
+            end: dt.datetime | dt.date | pd.Timestamp = TODAY,
+            fuel: str = None,
+            **params) -> pd.DataFrame:
+        """Returns the actual installed power generation on the Belgian grid."""
+        dataset = "ods035"
+        where_filter = self._construct_where_filter(**locals())
+        params.update({"where": where_filter})
+        df = self._execute_query(dataset, params)
+        df = self._process_results(df)
+        return df
+
     def _execute_query(self, dataset: str, params: dict) -> pd.DataFrame:
         """Executes the query and returns the raw DataFrame"""
         response = requests.get(self.BASE_URL + self.ENDPOINT % dataset, params=params)
@@ -131,14 +161,16 @@ class EliaPandasClient:
         """Constructs the 'where' filter expression to be passed as parameter to the query"""
         start, end = kwargs.get('start'), kwargs.get('end')
         region = kwargs.get('region')
+        fuel = kwargs.get('fuel')
         params = kwargs.get('params')
 
         date_filter = f"datetime IN [date'{start.strftime(DATETIME_FORMAT)}'" \
                       f"..date'{end.strftime(DATETIME_FORMAT)}'[" if (start and end) else None
         region_filter = f"region = '{region}'" if region else None
+        fuel_filter = f"fuel = '{fuel}'" if fuel else None
         params_filter = params.get('where') if params else None
 
-        return "AND ".join(filter(None, [date_filter, region_filter, params_filter]))
+        return "AND ".join(filter(None, [date_filter, region_filter, fuel_filter, params_filter]))
 
     @staticmethod
     def _process_results(df: pd.DataFrame) -> pd.DataFrame:
