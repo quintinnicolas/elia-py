@@ -3,7 +3,7 @@ import pytest
 from elia import elia
 
 start_1 = dt.datetime.today() - dt.timedelta(days=10)
-end_1 = dt.datetime.today() - dt.timedelta(days=1)
+end_1 = dt.datetime.today() - dt.timedelta(days=2)  # sometimes the latest data of yesterday is not yet available
 
 
 @pytest.fixture()
