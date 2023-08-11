@@ -175,7 +175,7 @@ class EliaPandasClient:
     @staticmethod
     def _process_results(df: pd.DataFrame) -> pd.DataFrame:
         """Processes and cleans the DataFrame"""
-        if len(df) > 0:  # DataFrame is not empty
+        if not df.empty:
             df["datetime"] = pd.to_datetime(df["datetime"])
             df = df.set_index("datetime").sort_index()
         return df

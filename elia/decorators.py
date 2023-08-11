@@ -13,8 +13,7 @@ def split_along_time(freq: str):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, start, end, **kwargs):
-            # dates = pd.date_range(start, end, freq=freq, inclusive="left")  # Python 3.10
-            dates = pd.date_range(start, end, freq=freq, closed="left")  # Python 3.9 or below
+            dates = pd.date_range(start, end, freq=freq, inclusive="left")
             if len(dates) == 0:
                 dates = dates.insert(len(dates), start)
             dates = dates.insert(len(dates), end)
