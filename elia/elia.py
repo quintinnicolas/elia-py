@@ -9,7 +9,7 @@ import datetime as dt
 import pandas as pd
 import requests
 
-from .decorators import split_along_time
+from elia.decorators import split_along_time
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%S"
 TODAY = dt.date.today()
