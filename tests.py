@@ -14,7 +14,7 @@ def connection() -> elia.EliaPandasClient:
 
 def test_wind_power_estimation_and_forecast(connection):
     """Testing wind query"""
-    df_test = connection.get_solar_power_estimation_and_forecast()
+    df_test = connection.get_wind_power_estimation_and_forecast()
     print(df_test)
 
 
