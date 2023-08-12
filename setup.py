@@ -26,6 +26,6 @@ setup(
         "License :: OSI Approved :: MIT License",
     ],
     package_data={
-        'entsoe-py': ['LICENSE.txt', 'README.md'],
+        'elia-py': ['LICENSE.txt', 'README.md'],
     },
 )
