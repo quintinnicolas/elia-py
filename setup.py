@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as file_readme:
 
 setup(
     name='elia-py',
-    version='0.2.1',
+    version='0.2.2',
     packages=find_packages(),
     url='https://github.com/quintinnicolas/elia-py',
     author='Nicolas Quintin',
