@@ -113,11 +113,10 @@ class EliaPandasClient:
             **params) -> pd.DataFrame:
         """Returns the measured and upscaled wind power generation on the Belgian grid."""
         dataset = "ods031"
-        datetime_field = "datetime_utc"  # This query uses a different naming convention for the datetime field
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
         df = self._execute_query(dataset, params)
-        df = self._process_results(df, datetime_field=datetime_field)
+        df = self._process_results(df)
         return df
 
     @split_along_time("5D")
@@ -175,9 +174,9 @@ class EliaPandasClient:
         return "AND ".join(filter(None, [date_filter, region_filter, fuel_filter, params_filter]))
 
     @staticmethod
-    def _process_results(df: pd.DataFrame, datetime_field: str = "datetime") -> pd.DataFrame:
+    def _process_results(df: pd.DataFrame) -> pd.DataFrame:
         """Processes and cleans the DataFrame"""
         if not df.empty:
-            df[datetime_field] = pd.to_datetime(df[datetime_field])
-            df = df.set_index(datetime_field).sort_index()
+            df["datetime"] = pd.to_datetime(df["datetime"])
+            df = df.set_index("datetime").sort_index()
         return df
