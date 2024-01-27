@@ -24,14 +24,14 @@ class EliaPandasClient:
         pass
 
     def get_current_system_imbalance(self, **params) -> pd.DataFrame:
-        """Returns the current system imbalance"""
+        """Returns the current system imbalance."""
         dataset = "ods088"
         df = self._execute_query(dataset, params)
         df = self._process_results(df)
         return df
 
     def get_imbalance_prices_per_min(self, **params) -> pd.DataFrame:
-        """Returns the current imbalance prices"""
+        """Returns the current imbalance prices."""
         dataset = "ods077"
         df = self._execute_query(dataset, params)
         df = self._process_results(df)
@@ -41,7 +41,7 @@ class EliaPandasClient:
             self,
             region: str | None = None,
             **params) -> pd.DataFrame:
-        """Returns the measured and upscaled photovoltaic power generation on the Belgian grid."""
+        """Returns solar power forecasts."""
         dataset = "ods087"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
@@ -53,7 +53,7 @@ class EliaPandasClient:
             self,
             region: str | None = None,
             **params) -> pd.DataFrame:
-        """Returns the measured and upscaled wind power generation on the Belgian grid."""
+        """Returns wind power forecasts."""
         dataset = "ods086"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
@@ -67,7 +67,7 @@ class EliaPandasClient:
             start: dt.datetime | dt.date | pd.Timestamp,
             end: dt.datetime | dt.date | pd.Timestamp,
             **params) -> pd.DataFrame:
-        """Returns the measured and upscaled photovoltaic power generation on the Belgian grid."""
+        """Returns the electrical load in the ELIA power system"""
         dataset = "ods003"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
@@ -163,9 +163,9 @@ class EliaPandasClient:
         region = kwargs.get('region')
         fuel = kwargs.get('fuel')
         params = kwargs.get('params')
-        datetime_field = kwargs.get('datetime_field', 'datetime')
+        datetime = kwargs.get('datetime')
 
-        date_filter = f"{datetime_field} IN [date'{start.strftime(DATETIME_FORMAT)}'" \
+        date_filter = f"{datetime} IN [date'{start.strftime(DATETIME_FORMAT)}'" \
                       f"..date'{end.strftime(DATETIME_FORMAT)}'[" if (start and end) else None
         region_filter = f"region = '{region}'" if region else None
         fuel_filter = f"fuel = '{fuel}'" if fuel else None
