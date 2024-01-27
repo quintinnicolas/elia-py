@@ -39,7 +39,7 @@ class EliaPandasClient:
 
     def get_solar_power_estimation_and_forecast(
             self,
-            region: str = None,
+            region: str | None = None,
             **params) -> pd.DataFrame:
         """Returns the measured and upscaled photovoltaic power generation on the Belgian grid."""
         dataset = "ods087"
@@ -51,7 +51,7 @@ class EliaPandasClient:
 
     def get_wind_power_estimation_and_forecast(
             self,
-            region: str = None,
+            region: str | None = None,
             **params) -> pd.DataFrame:
         """Returns the measured and upscaled wind power generation on the Belgian grid."""
         dataset = "ods086"
@@ -64,8 +64,8 @@ class EliaPandasClient:
     @split_along_time("5D")
     def get_load_on_elia_grid(
             self,
-            start: dt.datetime | dt.date | pd.Timestamp = YESTERDAY,
-            end: dt.datetime | dt.date | pd.Timestamp = TODAY,
+            start: dt.datetime | dt.date | pd.Timestamp,
+            end: dt.datetime | dt.date | pd.Timestamp,
             **params) -> pd.DataFrame:
         """Returns the measured and upscaled photovoltaic power generation on the Belgian grid."""
         dataset = "ods003"
@@ -78,8 +78,8 @@ class EliaPandasClient:
     @split_along_time("5D")
     def get_imbalance_prices_per_quarter_hour(
             self,
-            start: dt.datetime | dt.date | pd.Timestamp = YESTERDAY,
-            end: dt.datetime | dt.date | pd.Timestamp = TODAY,
+            start: dt.datetime | dt.date | pd.Timestamp,
+            end: dt.datetime | dt.date | pd.Timestamp,
             **params) -> pd.DataFrame:
         """Returns the imbalance prices per 15min"""
         dataset = "ods047"
@@ -92,9 +92,9 @@ class EliaPandasClient:
     @split_along_time("5D")
     def get_historical_solar_power_estimation_and_forecast(
             self,
-            start: dt.datetime | dt.date | pd.Timestamp = YESTERDAY,
-            end: dt.datetime | dt.date | pd.Timestamp = TODAY,
-            region: str = None,
+            start: dt.datetime | dt.date | pd.Timestamp,
+            end: dt.datetime | dt.date | pd.Timestamp,
+            region: str | None = None,
             **params) -> pd.DataFrame:
         """Returns the measured and upscaled photovoltaic power generation on the Belgian grid."""
         dataset = "ods032"
@@ -107,9 +107,9 @@ class EliaPandasClient:
     @split_along_time("5D")
     def get_historical_wind_power_estimation_and_forecast(
             self,
-            start: dt.datetime | dt.date | pd.Timestamp = YESTERDAY,
-            end: dt.datetime | dt.date | pd.Timestamp = TODAY,
-            region: str = None,
+            start: dt.datetime | dt.date | pd.Timestamp,
+            end: dt.datetime | dt.date | pd.Timestamp,
+            region: str | None = None,
             **params) -> pd.DataFrame:
         """Returns the measured and upscaled wind power generation on the Belgian grid."""
         dataset = "ods031"
@@ -122,9 +122,9 @@ class EliaPandasClient:
     @split_along_time("5D")
     def get_historical_power_generation_by_fuel_type(
             self,
-            start: dt.datetime | dt.date | pd.Timestamp = YESTERDAY,
-            end: dt.datetime | dt.date | pd.Timestamp = TODAY,
-            fuel: str = None,
+            start: dt.datetime | dt.date | pd.Timestamp,
+            end: dt.datetime | dt.date | pd.Timestamp,
+            fuel: str | None = None,
             **params) -> pd.DataFrame:
         """Returns the measured power generation on the Belgian grid by fuel type."""
         dataset = "ods033"
@@ -137,9 +137,9 @@ class EliaPandasClient:
     @split_along_time("5M")
     def get_installed_capacity_by_fuel_type(
             self,
-            start: dt.datetime | dt.date | pd.Timestamp = YESTERDAY,
-            end: dt.datetime | dt.date | pd.Timestamp = TODAY,
-            fuel: str = None,
+            start: dt.datetime | dt.date | pd.Timestamp,
+            end: dt.datetime | dt.date | pd.Timestamp,
+            fuel: str | None = None,
             **params) -> pd.DataFrame:
         """Returns the actual installed power generation on the Belgian grid."""
         dataset = "ods035"
