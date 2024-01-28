@@ -40,5 +40,9 @@ jobs:
     - name: Install tox
       shell: bash
       run: pip install --user --upgrade pip && pip install tox
-    - name: Execute Pytest, Pylint and Mypy tests
-      run: tox run
+    - name: Execute Pytest
+      run: tox run -e pytest
+    - name: Execute Pylint
+      run: tox run -e pylint
+    - name: Execute Mypy
+      run: tox run -e mypy
