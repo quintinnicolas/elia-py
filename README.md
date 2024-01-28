@@ -15,8 +15,8 @@ import datetime as dt
 from elia import elia
 
 connection = elia.EliaPandasClient()
-start = dt.datetime(2022, 1, 1)
-end = dt.datetime(2022, 1, 15)
+start = dt.datetime(2024, 1, 1)
+end = dt.datetime(2024, 1, 15)
 
 df = connection.get_imbalance_prices_per_quarter_hour(start=start, end=end)
 ```

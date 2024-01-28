@@ -90,3 +90,17 @@ def test_current_system_imbalance(connection):
     df_test = connection.get_current_system_imbalance()
     print(df_test)
     assert(df_test.index.nunique() >= 59)  # data per minute, only for the latest hour
+
+
+def test_system_imbalance_forecast_for_current_quarter_hour(connection):
+    """Testing imbalance forecast query"""
+    df_test = connection.get_system_imbalance_forecast_for_current_quarter_hour(limit=10)
+    print(df_test)
+    assert(df_test.index.nunique() == 10)
+
+
+def test_system_imbalance_forecast_for_next_quarter_hour(connection):
+    """Testing imbalance forecast query"""
+    df_test = connection.get_system_imbalance_forecast_for_next_quarter_hour(limit=10)
+    print(df_test)
+    assert(df_test.index.nunique() == 10)

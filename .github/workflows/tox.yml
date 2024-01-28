@@ -1,0 +1,44 @@
+name: elia
+on: [push]
+jobs:
+
+  detect-changes:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      folder: ${{ steps.filter.outputs.folder }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          folder: 
+            - '${{ github.workflow }}/**'
+            - '.github/**'
+
+  tox:
+    needs: detect-changes
+    if: (needs.detect-changes.outputs.folder == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: |
+            3.8
+            3.9
+            3.10
+            3.11
+            3.12
+    - name: Install tox
+      shell: bash
+      run: pip install --user --upgrade pip && pip install tox
+    - name: Execute Pytest, Pylint and Mypy
+      run: tox -p all
