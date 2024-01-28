@@ -149,6 +149,30 @@ class EliaPandasClient:
         df = self._process_results(df)
         return df
 
+    def get_system_imbalance_forecast_for_current_quarter_hour(
+            self,
+            limit: int = 100,
+            **params) -> pd.DataFrame:
+        """Returns the imbalance prices forecast for the current quarter-hour"""
+        dataset = "ods136"
+        where_filter = self._construct_where_filter(**locals())
+        params.update({"where": where_filter, "limit": limit})
+        df = self._execute_query(dataset, params)
+        df = self._process_results(df, datetime_field="predictiontimeutc")
+        return df
+
+    def get_system_imbalance_forecast_for_next_quarter_hour(
+            self,
+            limit: int = 100,
+            **params) -> pd.DataFrame:
+        """Returns the imbalance prices forecast for the next quarter-hour"""
+        dataset = "ods147"
+        where_filter = self._construct_where_filter(**locals())
+        params.update({"where": where_filter, "limit": limit})
+        df = self._execute_query(dataset, params)
+        df = self._process_results(df, datetime_field="predictiontimeutc")
+        return df
+
     def _execute_query(self, dataset: str, params: dict) -> pd.DataFrame:
         """Executes the query and returns the raw DataFrame"""
         response = requests.get(self.BASE_URL + self.ENDPOINT % dataset, params=params)
@@ -163,9 +187,9 @@ class EliaPandasClient:
         region = kwargs.get('region')
         fuel = kwargs.get('fuel')
         params = kwargs.get('params')
-        datetime = kwargs.get('datetime')
+        datetime_field = kwargs.get('datetime_field', 'datetime')
 
-        date_filter = f"{datetime} IN [date'{start.strftime(DATETIME_FORMAT)}'" \
+        date_filter = f"{datetime_field} IN [date'{start.strftime(DATETIME_FORMAT)}'" \
                       f"..date'{end.strftime(DATETIME_FORMAT)}'[" if (start and end) else None
         region_filter = f"region = '{region}'" if region else None
         fuel_filter = f"fuel = '{fuel}'" if fuel else None
@@ -174,9 +198,9 @@ class EliaPandasClient:
         return "AND ".join(filter(None, [date_filter, region_filter, fuel_filter, params_filter]))
 
     @staticmethod
-    def _process_results(df: pd.DataFrame) -> pd.DataFrame:
+    def _process_results(df: pd.DataFrame, datetime_field: str = "datetime") -> pd.DataFrame:
         """Processes and cleans the DataFrame"""
         if not df.empty:
-            df["datetime"] = pd.to_datetime(df["datetime"])
-            df = df.set_index("datetime").sort_index()
+            df[datetime_field] = pd.to_datetime(df[datetime_field])
+            df = df.set_index(datetime_field).sort_index()
         return df
