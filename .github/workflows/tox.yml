@@ -41,8 +41,8 @@ jobs:
       shell: bash
       run: pip install --user --upgrade pip && pip install tox
     - name: Execute Pytest
-      run: tox run -e pytest
+      run: tox run pytest
     - name: Execute Pylint
-      run: tox run -e pylint
+      run: tox run pylint
     - name: Execute Mypy
-      run: tox run -e mypy
+      run: tox run mypy
