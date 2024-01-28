@@ -10,7 +10,7 @@ import datetime as dt
 import pandas as pd
 import requests
 
-from elia.decorators import split_along_time
+from .decorators import split_along_time
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%S"
 
@@ -138,7 +138,7 @@ class EliaPandasClient:
         df = self._process_results(df)
         return df
 
-    @split_along_time("5ME")
+    @split_along_time("5M")
     def get_installed_capacity_by_fuel_type(
             self,
             start: dt.datetime | dt.date | pd.Timestamp,
