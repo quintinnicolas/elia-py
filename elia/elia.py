@@ -13,8 +13,6 @@ import requests
 from elia.decorators import split_along_time
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%S"
-TODAY = dt.date.today()
-YESTERDAY = TODAY - dt.timedelta(days=1)
 
 
 class EliaPandasClient:
