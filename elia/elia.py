@@ -1,8 +1,6 @@
-"""
-@author: nicolasquintin
-"""
 from __future__ import annotations
 from typing import Any
+from typing_extensions import deprecated
 
 import json
 import datetime as dt
@@ -26,8 +24,11 @@ class EliaPandasClient:
     def get_current_system_imbalance(
             self,
             **params: Any) -> pd.DataFrame:
-        """Returns the current system imbalance."""
-        dataset = "ods088"
+        """This report contains data for the current hour and is refreshed every minute. Instantaneous system imbalance
+        (and its components) and the area control error (ACE) in Elia’s control area. All published values are
+        non-validated values and can only be used for information purposes. This dataset contains data from
+        22/05/2024 (MARI local go-live) on."""
+        dataset = "ods169"
         df = self._execute_query(dataset, params)
         df = self._process_results(df)
         return df
@@ -35,8 +36,11 @@ class EliaPandasClient:
     def get_imbalance_prices_per_min(
             self,
             **params: Any) -> pd.DataFrame:
-        """Returns the current imbalance prices."""
-        dataset = "ods077"
+        """The 1min imbalance prices are published as fast as possible and give an indication for the final imbalance
+        price of the ISP (imbalance settlement period which is 15min). This report contains data for the current hour
+        and is refreshed every minute. Notice that in this report we only provide non-validated data. This dataset
+        contains data from 22/05/2024 (MARI local go-live) on."""
+        dataset = "ods161"
         df = self._execute_query(dataset, params)
         df = self._process_results(df)
         return df
@@ -45,7 +49,8 @@ class EliaPandasClient:
             self,
             region: str | None = None,
             **params: Any) -> pd.DataFrame:
-        """Returns solar power forecasts."""
+        """Intraday forecast, day-ahead and week-ahead forecast of photovoltaic power capacity on the Belgian grid.
+        The values are updated every quarter-hour."""
         dataset = "ods087"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
@@ -57,7 +62,8 @@ class EliaPandasClient:
             self,
             region: str | None = None,
             **params: Any) -> pd.DataFrame:
-        """Returns wind power forecasts."""
+        """Intraday forecast, day-ahead and week-ahead forecast of wind power capacity on the Belgian grid.
+        The values are updated every quarter-hour."""
         dataset = "ods086"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
@@ -71,8 +77,28 @@ class EliaPandasClient:
             start: dt.datetime | dt.date | pd.Timestamp,
             end: dt.datetime | dt.date | pd.Timestamp,
             **params: Any) -> pd.DataFrame:
-        """Returns the electrical load in the ELIA power system"""
+        """Measured and upscaled load on the Elia grid."""
         dataset = "ods003"
+        where_filter = self._construct_where_filter(**locals())
+        params.update({"where": where_filter})
+        df = self._execute_query(dataset, params)
+        df = self._process_results(df)
+        return df
+
+    @deprecated("This method only returns data prior to 21/05/2024 (MARI go-live)")
+    @split_along_time("5D")
+    def get_imbalance_prices_per_quarter_hour_before_mari(
+            self,
+            start: dt.datetime | dt.date | pd.Timestamp,
+            end: dt.datetime | dt.date | pd.Timestamp,
+            **params: Any) -> pd.DataFrame:
+        """System imbalance prices applied if an imbalance is found between injections and offtakes in a balance
+        responsible parties (BRPs) balance area. When imbalance prices are published on a quarter-hourly basis,
+        the published prices have not yet been validated and can therefore only be used as an indication of the
+        imbalance price.Only after the published prices have been validated can they be used for invoicing purposes.
+        The records for month M are validated after the 15th of month M+1. Contains the historical data and is
+        refreshed daily. This dataset contains data until 21/05/2024 (before MARI local go-live)."""
+        dataset = "ods047"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
         df = self._execute_query(dataset, params)
@@ -85,8 +111,12 @@ class EliaPandasClient:
             start: dt.datetime | dt.date | pd.Timestamp,
             end: dt.datetime | dt.date | pd.Timestamp,
             **params: Any) -> pd.DataFrame:
-        """Returns the imbalance prices per 15min"""
-        dataset = "ods047"
+        """Imbalance prices used for balancing responsible parties (BRPs)settlment. When imbalance prices are published
+        on a quarter-hourly basis, the published prices have not yet been validated and can therefore only be used as
+        an indication of the imbalance price. Only after the published prices have been validated can they be used for
+        invoicing purposes. The records for month M are validated after the 15th of month M+1. Contains the historical
+        data and is refreshed daily.This dataset contains data from 22/05/2024 (MARI local go-live) on."""
+        dataset = "ods134"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
         df = self._execute_query(dataset, params)
@@ -100,7 +130,8 @@ class EliaPandasClient:
             end: dt.datetime | dt.date | pd.Timestamp,
             region: str | None = None,
             **params: Any) -> pd.DataFrame:
-        """Returns the measured and upscaled photovoltaic power generation on the Belgian grid."""
+        """Measured and upscaled photovoltaic power generation on the Belgian grid.Please note that the measured and
+        forecast values are in MW, it is of the users responsibility to interpret the values as such."""
         dataset = "ods032"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
@@ -115,7 +146,8 @@ class EliaPandasClient:
             end: dt.datetime | dt.date | pd.Timestamp,
             region: str | None = None,
             **params: Any) -> pd.DataFrame:
-        """Returns the measured and upscaled wind power generation on the Belgian grid."""
+        """Measured and upscaled wind power generation on the Belgian grid.Please note that the measured and forecast
+         values are in MW, it is of the users responsibility to interpret the values as such."""
         dataset = "ods031"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
@@ -123,30 +155,17 @@ class EliaPandasClient:
         df = self._process_results(df)
         return df
 
-    @split_along_time("5D")
-    def get_historical_power_generation_by_fuel_type(
+    @deprecated("This method only returns data prior to 21/05/2024 (ICAROS go-live)")
+    @split_along_time("MS")
+    def get_historical_power_generation_by_fuel_type_before_icaros(
             self,
             start: dt.datetime | dt.date | pd.Timestamp,
             end: dt.datetime | dt.date | pd.Timestamp,
             fuel: str | None = None,
             **params: Any) -> pd.DataFrame:
-        """Returns the measured power generation on the Belgian grid by fuel type."""
+        """Energy generated by unit operated under a Contract for the Injection of Production Units (CIPUs) signed with
+        Elia, aggregated by fuel type. This dataset contains data until 21/05/2024 (before ICAROS local go-live)."""
         dataset = "ods033"
-        where_filter = self._construct_where_filter(**locals())
-        params.update({"where": where_filter})
-        df = self._execute_query(dataset, params)
-        df = self._process_results(df)
-        return df
-
-    @split_along_time("5M")
-    def get_installed_capacity_by_fuel_type(
-            self,
-            start: dt.datetime | dt.date | pd.Timestamp,
-            end: dt.datetime | dt.date | pd.Timestamp,
-            fuel: str | None = None,
-            **params: Any) -> pd.DataFrame:
-        """Returns the actual installed power generation on the Belgian grid."""
-        dataset = "ods035"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
         df = self._execute_query(dataset, params)
@@ -157,7 +176,12 @@ class EliaPandasClient:
             self,
             limit: int = 100,
             **params: Any) -> pd.DataFrame:
-        """Returns the imbalance prices forecast for the current quarter-hour"""
+        """This report contains a forecast of the average quarter-hourly system imbalance in the current quarter-hour
+        as well as an estimated probability distribution of the average quarter-hourly system imbalance in the current
+        quarter hour. The data reflects Elia's own forecasts of the system imbalance. It must be noted that these
+        forecasts can have a significant error margin, are not binding for Elia and are therefore merely shared for
+        informational purposes and that under no circumstances the publication or the use of this information imply a
+        shift in responsibility or liability towards Elia."""
         dataset = "ods136"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter, "limit": limit})
@@ -169,7 +193,12 @@ class EliaPandasClient:
             self,
             limit: int = 100,
             **params: Any) -> pd.DataFrame:
-        """Returns the imbalance prices forecast for the next quarter-hour"""
+        """The report contains a forecast of the average quarter-hourly system imbalance in the next quarter hour as
+         well as an estimated probability distribution of the average quarter-hourly system imbalance in the next
+         quarter hour. The data reflects Elia's own forecasts of the system imbalance. It must be noted that these
+         forecasts can have a significant error margin, are not binding for Elia and are therefore merely shared for
+         informational purposes and that under no circumstances the publication or the use of this information imply
+         a shift in responsibility or liability towards Elia."""
         dataset = "ods147"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter, "limit": limit})
