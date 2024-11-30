@@ -85,11 +85,8 @@ class EliaPandasClient:
         df = self._process_results(df)
         return df
     
-    @split_along_time("5D")
     def get_near_real_time_imbalance_prices_per_quarter_hour(
             self,
-            start: dt.datetime | dt.date | pd.Timestamp,
-            end: dt.datetime | dt.date | pd.Timestamp,
             **params: Any) -> pd.DataFrame:
         """Imbalance prices used for balance responsible parties (BRPs) settlement for every quarter hour. 
         This report contains data for the current day and is refreshed every quarter-hour.
