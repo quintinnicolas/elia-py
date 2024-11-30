@@ -84,10 +84,24 @@ class EliaPandasClient:
         df = self._execute_query(dataset, params)
         df = self._process_results(df)
         return df
+    
+    def get_near_real_time_imbalance_prices_per_quarter_hour(
+            self,
+            **params: Any) -> pd.DataFrame:
+        """Imbalance prices used for balance responsible parties (BRPs) settlement for every quarter hour. 
+        This report contains data for the current day and is refreshed every quarter-hour.
+        Notice that in this report we only provide non-validated data.
+        This dataset contains data from 22/05/2024 (MARI local go-live) on."""
+        dataset = "ods162"
+        where_filter = self._construct_where_filter(**locals())
+        params.update({"where": where_filter})
+        df = self._execute_query(dataset, params)
+        df = self._process_results(df)
+        return df
 
     @deprecated("This method only returns data prior to 21/05/2024 (MARI go-live)")
     @split_along_time("5D")
-    def get_imbalance_prices_per_quarter_hour_before_mari(
+    def get_historical_imbalance_prices_per_quarter_hour_before_mari(
             self,
             start: dt.datetime | dt.date | pd.Timestamp,
             end: dt.datetime | dt.date | pd.Timestamp,
@@ -106,7 +120,7 @@ class EliaPandasClient:
         return df
 
     @split_along_time("5D")
-    def get_imbalance_prices_per_quarter_hour(
+    def get_historical_imbalance_prices_per_quarter_hour(
             self,
             start: dt.datetime | dt.date | pd.Timestamp,
             end: dt.datetime | dt.date | pd.Timestamp,
@@ -115,7 +129,7 @@ class EliaPandasClient:
         on a quarter-hourly basis, the published prices have not yet been validated and can therefore only be used as
         an indication of the imbalance price. Only after the published prices have been validated can they be used for
         invoicing purposes. The records for month M are validated after the 15th of month M+1. Contains the historical
-        data and is refreshed daily.This dataset contains data from 22/05/2024 (MARI local go-live) on."""
+        data and is refreshed daily. This dataset contains data from 22/05/2024 (MARI local go-live) on."""
         dataset = "ods134"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
