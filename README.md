@@ -15,10 +15,10 @@ import datetime as dt
 from elia import elia
 
 connection = elia.EliaPandasClient()
-start = dt.datetime(2024, 1, 1)
-end = dt.datetime(2024, 1, 15)
+start = dt.datetime(2024, 11, 1)
+end = dt.datetime(2024, 11, 15)
 
-df = connection.get_imbalance_prices_per_quarter_hour(start=start, end=end)
+df = connection.get_historical_imbalance_prices_per_quarter_hour(start=start, end=end)
 ```
 ### Notes
 This work has been inspired by a similar project `entsoe-py` available on 
