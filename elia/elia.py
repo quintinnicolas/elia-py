@@ -15,7 +15,7 @@ DATETIME_FORMAT = "%Y-%m-%d %H:%S"
 
 class EliaPandasClient:
     """Simple Python 3 client for the Elia Open Data API"""
-    BASE_URL = r"https://opendata.elia.be/api/v2"
+    BASE_URL = r"https://opendata.elia.be/api/explore/v2.1/"
     ENDPOINT = r"/catalog/datasets/%s/exports/json"
 
     def __init__(self) -> None:
