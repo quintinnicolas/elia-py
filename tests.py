@@ -61,11 +61,15 @@ def test_load_on_elia_grid(connection, start, end):
     print(df_test)
     assert df_test.index.nunique() >= number_of_quarter_hours
 
+def test_near_real_time_imbalance_prices_per_quarter(connection):
+    """Testing imbalance price query, near real time"""
+    df_test = connection.get_near_real_time_imbalance_prices_per_quarter_hour()
+    assert not df_test.empty
 
 @pytest.mark.parametrize("start, end", [(start_recent, end_recent)])
 def test_imbalance_prices_per_quarter(connection, start, end):
     """Testing imbalance price query"""
-    df_test = connection.get_imbalance_prices_per_quarter_hour(start=start, end=end)
+    df_test = connection.get_historical_imbalance_prices_per_quarter_hour(start=start, end=end)
     number_of_quarter_hours = (end-start).days * 24 * 4
     print(df_test)
     assert df_test.index.nunique() >= number_of_quarter_hours
@@ -74,7 +78,7 @@ def test_imbalance_prices_per_quarter(connection, start, end):
 @pytest.mark.parametrize("start, end", [(start_old, end_old)])
 def test_old_imbalance_prices_per_quarter(connection, start, end):
     """Testing imbalance price query"""
-    df_test = connection.get_imbalance_prices_per_quarter_hour_before_mari(start=start, end=end)
+    df_test = connection.get_historical_imbalance_prices_per_quarter_hour_before_mari(start=start, end=end)
     number_of_quarter_hours = (end-start).days * 24 * 4
     print(df_test)
     assert df_test.index.nunique() >= number_of_quarter_hours
