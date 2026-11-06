@@ -51,7 +51,7 @@ class EliaPandasClient:
             **params: Any) -> pd.DataFrame:
         """Intraday forecast, day-ahead and week-ahead forecast of photovoltaic power capacity on the Belgian grid.
         The values are updated every quarter-hour."""
-        dataset = "ods087"
+        dataset = "ods210"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
         df = self._execute_query(dataset, params)
@@ -146,7 +146,7 @@ class EliaPandasClient:
             **params: Any) -> pd.DataFrame:
         """Measured and upscaled photovoltaic power generation on the Belgian grid.Please note that the measured and
         forecast values are in MW, it is of the users responsibility to interpret the values as such."""
-        dataset = "ods032"
+        dataset = "ods209"
         where_filter = self._construct_where_filter(**locals())
         params.update({"where": where_filter})
         df = self._execute_query(dataset, params)
